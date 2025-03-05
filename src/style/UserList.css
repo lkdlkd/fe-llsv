@@ -1,0 +1,70 @@
+/* UserList.css */
+.user-list-container {
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+  }
+  
+  .user-list-container h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
+  }
+  
+  .user-list-container table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+  }
+  
+  .user-list-container th,
+  .user-list-container td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
+  }
+  
+  .user-list-container th {
+    background-color: #f2f2f2;
+  }
+  
+  .user-list-container button {
+    padding: 6px 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 5px;
+  }
+  
+  .user-list-container button:hover {
+    opacity: 0.9;
+  }
+  
+  .user-list-container .btn-edit {
+    background-color: #28a745;
+    color: #fff;
+  }
+  
+  .user-list-container .btn-delete {
+    background-color: #dc3545;
+    color: #fff;
+  }
+  
+  .user-list-container .btn-add-balance {
+    background-color: #007bff;
+    color: #fff;
+  }
+  
+  .user-list-container .pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .user-list-container .pagination button {
+    padding: 8px 12px;
+    margin: 0 10px;
+  }
+  
