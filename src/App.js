@@ -43,16 +43,16 @@ function App() {
   const [role, setRole] = useState(getRole());
   const [token, setToken] = useState(getToken());
   
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (devtools.isOpen) {
-        alert("Phát hiện DevTools! Trang sẽ bị vô hiệu hóa.");
-        window.location.href = "*"; // Điều hướng đến trang trống
-      }
-    }, 1000);
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     if (devtools.isOpen) {
+  //       alert("Phát hiện DevTools! Trang sẽ bị vô hiệu hóa.");
+  //       window.location.href = "*"; // Điều hướng đến trang trống
+  //     }
+  //   }, 1000);
   
-    return () => clearInterval(interval); // Xóa interval khi component unmount
-  }, []);
+  //   return () => clearInterval(interval); // Xóa interval khi component unmount
+  // }, []);
   
   useEffect(() => {
     const handleStorageChange = () => {
