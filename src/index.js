@@ -2,12 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
-    (function () {
-        debugger;  // Khi DevTools mở, trình duyệt sẽ dừng lại ở đây
-        // Thêm các lệnh khác ở đây
-        console.log("Hàm đã chạy");
-    })();
-    
+
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>

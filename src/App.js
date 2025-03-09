@@ -15,6 +15,11 @@ import HistoryUser from "./components/user/HistoryUser";
 import Naptien from "./components/user/Naptien";
 import Banking from "./components/admin/Banking";
 
+(function () {
+  debugger;  // Khi DevTools mở, trình duyệt sẽ dừng lại ở đây
+  // Thêm các lệnh khác ở đây
+  console.log("Hàm đã chạy");
+})();
 
 const getRole = () => {
   return localStorage.getItem("role") || "";
@@ -51,9 +56,9 @@ function App() {
         {/* Các trang có Layout */}
         <Route path="/" element={token ? <Layout /> : <Navigate to="/dang-nhap" />}>
           <Route index element={<Home />} />
-        
-          <Route path="dichvu" element={token  ? <ServerFilterForm /> : <Navigate to="/quantri" />} />
-          <Route path="danh-sach-don" element={token ?<Danhsachdon /> : <Navigate to="/quantri" />} />
+
+          <Route path="dichvu" element={token ? <ServerFilterForm /> : <Navigate to="/quantri" />} />
+          <Route path="danh-sach-don" element={token ? <Danhsachdon /> : <Navigate to="/quantri" />} />
           <Route path="lich-su-hoat-dong" element={token ? <HistoryUser /> : <Navigate to="/quantri" />} />
           <Route path="nap-tien" element={token ? <Naptien /> : <Navigate to="/quantri" />} />
 

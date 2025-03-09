@@ -79,7 +79,7 @@ function MenuUser() {
                 <span className="pc-mtext">Trang Quản Trị</span>
               </a>
             </li> */}
-            
+
             <li className="pc-item pc-caption">
               <label>Bảng Điều Khiển</label>
             </li>
@@ -139,11 +139,11 @@ function MenuUser() {
                 </ul>
               )}
             </li>
-            
+
             <li className="pc-item pc-caption">
               <label>Danh Sách Dịch Vụ</label>
             </li>
-            
+
             <li className="pc-item pc-hasmenu">
               <a href="dichvu" className="pc-link">
                 <span className="pc-micon">
@@ -167,7 +167,7 @@ function MenuUser() {
               </a>
             </li>
             <li className="pc-item pc-hasmenu">
-                          <Logout />
+              <Logout />
 
             </li>
           </ul>
