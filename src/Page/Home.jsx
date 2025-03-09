@@ -3,27 +3,38 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import "../App.css";
 
-
 function Home() {
-  const [user, setUser] = useState([]);
+  const [user, setUser] = useState({});
   const username = localStorage.getItem("username");
+  const token = localStorage.getItem("token"); // Hoặc cách lưu trữ khác
+
   const [message, setMessage] = useState("");
+
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const response = await axios.get(`${process.env.REACT_APP_URL}/api/user/${username}`, {
-          params: { username },
-        });
+        const response = await axios.get(
+          `${process.env.REACT_APP_URL}/api/user/${username}`,
+          {
+            headers: {
+              "Authorization": `Bearer ${token}`
+            },
+            params: { username }
+          }
+        );
         setUser(response.data);
       } catch (error) {
         setMessage(
-          error.response ? error.response.data.message : "Có lỗi xảy ra, vui lòng thử lại!"
+          error.response
+            ? error.response.data.message
+            : "Có lỗi xảy ra, vui lòng thử lại!"
         );
         console.error("Lỗi khi lấy thông tin user", error);
       }
     };
     fetchUser();
-  }, [username]);
+  }, [username, token]);
+
   return (
     <div className="row">
       <div className="col-md-6 col-xxl-3">
@@ -36,7 +47,9 @@ function Home() {
                 </div>
               </div>
               <div className="flex-grow-1 ms-3">
-                <h4 className="mb-0">{Number(user.balance).toLocaleString("vi-VN")}đ</h4>
+                <h4 className="mb-0">
+                  {Number(user.balance).toLocaleString("vi-VN")}đ
+                </h4>
                 <h6 className="mb-0">Số dư hiện tại</h6>
               </div>
             </div>
@@ -72,7 +85,9 @@ function Home() {
                 </div>
               </div>
               <div className="flex-grow-1 ms-3">
-                <h4 className="mb-0">{Number(user.tongnap).toLocaleString("vi-VN")}đ</h4>
+                <h4 className="mb-0">
+                  {Number(user.tongnap).toLocaleString("vi-VN")}đ
+                </h4>
                 <h6 className="mb-0">Tổng nạp</h6>
               </div>
             </div>

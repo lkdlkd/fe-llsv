@@ -15,7 +15,16 @@ const Logout = () => {
   };
 
   return (
-    <button onClick={handleLogout}>Đăng xuất</button>
+    <>
+      <span className="pc-micon">
+        {/* <img src="/transactions.png" className="wid-35" alt="Service Platform 1" /> */}
+      </span>
+      <button onClick={handleLogout}>Đăng xuất</button>
+      <span className="pc-arrow">
+        <i data-feather="chevron-right"></i>
+      </span>
+    </>
+
   );
 };
 

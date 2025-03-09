@@ -4,52 +4,60 @@ import axios from "axios";
 import "../App.css";
 import Logout from "./Logout";
 
-function Header({ isMenuOpen, setIsMenuOpen }) {
+function Header({ isMenuOpen, setIsMenuOpen , user }) {
   const [activeMenu, setActiveMenu] = useState(null); // Lưu menu nào đang mở
+  const token = localStorage.getItem("token"); // Hoặc cách lưu trữ khác
 
-  const [user, setUser] = useState([]);
-  const username = localStorage.getItem("username");
-  const [message, setMessage] = useState("");
+  // const [user, setUser] = useState([]);
+  // const username = localStorage.getItem("username");
+  // const [message, setMessage] = useState("");
+
   const handleActiveMenu = (e) => {
     // Ngăn chặn sự kiện lan truyền nếu cần
     e.stopPropagation();
     // Nếu màn hình nhỏ (mobile/tablet), toggle sidebar
     if (window.innerWidth <= 1024) {
-      const sidebar = document.querySelector('.pc-sidebar');
+      const sidebar = document.querySelector(".pc-sidebar");
       if (sidebar) {
-        sidebar.classList.toggle('open');
+        sidebar.classList.toggle("open");
       }
     }
-    // Nếu cần gọi active_menu (nếu bạn có logic active menu khác)
   };
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const response = await axios.get(`${process.env.REACT_APP_URL}/api/user/${username}`, {
-          params: { username },
-        });
-        setUser(response.data);
-      } catch (error) {
-        setMessage(
-          error.response ? error.response.data.message : "Có lỗi xảy ra, vui lòng thử lại!"
-        );
-        console.error("Lỗi khi lấy thông tin user", error);
-      }
-    };
-    fetchUser();
-  }, [username]);
+
+  // useEffect(() => {
+  //   const fetchUser = async () => {
+  //     try {
+  //       const response = await axios.get(
+  //         `${process.env.REACT_APP_URL}/api/user/${username}`,
+  //         {
+  //           headers: {
+  //             "Authorization": `Bearer ${token}`,
+  //           },
+  //           params: { username },
+  //         }
+  //       );
+  //       setUser(response.data);
+  //     } catch (error) {
+  //       setMessage(
+  //         error.response
+  //           ? error.response.data.message
+  //           : "Có lỗi xảy ra, vui lòng thử lại!"
+  //       );
+  //       console.error("Lỗi khi lấy thông tin user", error);
+  //     }
+  //   };
+  //   fetchUser();
+  // }, [username, token]);
+
   const toggleMenu = (menuName) => {
     setActiveMenu(activeMenu === menuName ? null : menuName);
   };
+
   return (
     <header className="pc-header">
       <div className="header-wrapper">
         {/* [Mobile Media Block] start */}
-
-
-
-
-        <div className="me-auto pc-mob-drp" >
+        <div className="me-auto pc-mob-drp">
           <ul onClick={handleActiveMenu} className="list-unstyled">
             {/* ======= Menu collapse Icon ===== */}
             <li className="pc-h-item pc-sidebar-collapse">
@@ -86,15 +94,13 @@ function Header({ isMenuOpen, setIsMenuOpen }) {
             </li>
           </ul>
         </div>
-
-
-
-        <div class="ms-auto">
+        {/* [Mobile Media Block] end */}
+        <div className="ms-auto">
           <ul>
-            {/* Đoạn mã người dùng được chuyển thành HTML tĩnh */}
+            {/* User Block */}
             <li className="dropdown pc-h-item header-user-profile">
               <span className="pc-mtext">
-                <label>Số dư : </label>
+                <label>Số dư: </label>
                 {user.balance}
               </span>
               <a
@@ -115,7 +121,6 @@ function Header({ isMenuOpen, setIsMenuOpen }) {
             {/* End user block */}
           </ul>
         </div>
-
       </div>
     </header>
   );

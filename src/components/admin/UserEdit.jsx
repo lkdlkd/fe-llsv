@@ -5,6 +5,7 @@ import "../../style/UserEdit.css";  // Import file CSS
 
 const UserEdit = ({ user, onClose, onUserUpdated }) => {
   const [formData, setFormData] = useState(user);
+  const token = localStorage.getItem('token'); // Hoặc cách lưu trữ khác
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -13,7 +14,15 @@ const UserEdit = ({ user, onClose, onUserUpdated }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.put(`${process.env.REACT_APP_URL}/api/user/update/${user._id}`, formData);
+      await axios.put(
+        `${process.env.REACT_APP_URL}/api/user/update/${user._id}`,
+        formData,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        }
+      );
       toast.success("Cập nhật thành công!");
       onUserUpdated();
       onClose();
@@ -27,7 +36,13 @@ const UserEdit = ({ user, onClose, onUserUpdated }) => {
       <h3>Cập nhật người dùng</h3>
       <form onSubmit={handleSubmit}>
         <label>Username:</label>
-        <input type="text" name="username" value={formData.username} onChange={handleChange} disabled /><br />
+        <input
+          type="text"
+          name="username"
+          value={formData.username}
+          onChange={handleChange}
+          disabled
+        /><br />
         
         <label>Role:</label>
         <select name="role" value={formData.role} onChange={handleChange}>
@@ -36,7 +51,12 @@ const UserEdit = ({ user, onClose, onUserUpdated }) => {
         </select><br />
         
         <label>Balance:</label>
-        <input type="number" name="balance" value={formData.balance} onChange={handleChange} /><br />
+        <input
+          type="number"
+          name="balance"
+          value={formData.balance}
+          onChange={handleChange}
+        /><br />
         
         <button type="submit">Lưu</button>
         <button type="button" onClick={onClose}>Hủy</button>

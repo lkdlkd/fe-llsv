@@ -16,10 +16,15 @@ const UserList = () => {
   useEffect(() => {
     fetchUsers();
   }, [page]);
+  const token = localStorage.getItem('token'); // Hoặc cách lưu trữ khác
 
   const fetchUsers = async () => {
     try {
-      const response = await axios.get(`${process.env.REACT_APP_URL}/api/user?page=${page}&limit=10`);
+      const response = await axios.get(`${process.env.REACT_APP_URL}/api/user?page=${page}&limit=10`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
       setUsers(response.data.users);
       setTotalPages(response.data.totalPages);
     } catch (error) {
@@ -30,7 +35,12 @@ const UserList = () => {
   const deleteUser = async (id) => {
     if (!window.confirm("Bạn có chắc muốn xóa người dùng này?")) return;
     try {
-      await axios.delete(`${process.env.REACT_APP_URL}/api/user/delete/${id}`);
+      await axios.delete(`${process.env.REACT_APP_URL}/api/user/delete/${id}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        }
+      );
       toast.success("Xóa thành công!");
       fetchUsers();
     } catch (error) {

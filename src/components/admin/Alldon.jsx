@@ -19,31 +19,35 @@ const Alldon = () => {
   const [totalPages, setTotalPages] = useState(1);
   const limit = 10; // Số đơn hàng mỗi trang
 
-  const username = localStorage.getItem("username");
+  const token = localStorage.getItem('token'); // Lấy token từ localStorage
 
   // Lấy danh sách server từ API khi component load
   useEffect(() => {
     const fetchServers = async () => {
       try {
-        const response = await axios.get(`${process.env.REACT_APP_URL}/api/server`);
+        const response = await axios.get(`${process.env.REACT_APP_URL}/api/server`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
         setServers(response.data.data);
       } catch (error) {
         console.error("Lỗi khi tải danh sách server:", error);
       }
     };
     fetchServers();
-  }, []);
+  }, [token]);
 
   // Tạo danh sách type và category dựa theo danh sách server
   const uniqueTypes = Array.from(new Set(servers.map((server) => server.type)));
   const categoriesForType = selectedType
     ? Array.from(
-      new Set(
-        servers
-          .filter((server) => server.type === selectedType)
-          .map((server) => server.category)
+        new Set(
+          servers
+            .filter((server) => server.type === selectedType)
+            .map((server) => server.category)
+        )
       )
-    )
     : [];
 
   // Lọc danh sách server theo type và category đã chọn
@@ -70,14 +74,20 @@ const Alldon = () => {
   // Lấy danh sách đơn hàng của người dùng theo category đã chọn
   useEffect(() => {
     const fetchOrders = async () => {
-      if ( !selectedCategory) {
+      if (!selectedCategory) {
         setLoadingOrders(false);
         return;
       }
       try {
-        const response = await axios.get(`${process.env.REACT_APP_URL}/api/order/getOrder`, {
-          params: { category: selectedCategory, page: currentPage, limit }
-        });
+        const response = await axios.get(
+          `${process.env.REACT_APP_URL}/api/order/getOrder`,
+          {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            },
+            params: { category: selectedCategory, page: currentPage, limit }
+          }
+        );
         // Giả sử API trả về object { orders, currentPage, totalPages, totalOrders }
         setOrders(response.data.orders);
         setCurrentPage(response.data.currentPage);
@@ -93,17 +103,28 @@ const Alldon = () => {
       }
     };
     fetchOrders();
-  }, [ selectedCategory, currentPage]);
- // Hàm xử lý xóa đơn hàng
- const handleDelete = async (orderId) => {
+  }, [selectedCategory, currentPage, token]);
+
+  // Hàm xử lý xóa đơn hàng
+  const handleDelete = async (orderId) => {
     if (!window.confirm("Bạn có chắc chắn muốn xóa đơn hàng này không?")) return;
     try {
-      await axios.delete(`${process.env.REACT_APP_URL}/api/order/${orderId}`);
+      await axios.delete(`${process.env.REACT_APP_URL}/api/order/${orderId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
       setMessage("Xóa đơn hàng thành công!");
       // Làm mới lại danh sách đơn hàng sau khi xóa
-      const response = await axios.get(`${process.env.REACT_APP_URL}/api/order/getOrder`, {
-        params: { category: selectedCategory, page: currentPage, limit }
-      });
+      const response = await axios.get(
+        `${process.env.REACT_APP_URL}/api/order/getOrder`,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          },
+          params: { category: selectedCategory, page: currentPage, limit }
+        }
+      );
       setOrders(response.data.orders);
       setCurrentPage(response.data.currentPage);
       setTotalPages(response.data.totalPages);
@@ -115,6 +136,7 @@ const Alldon = () => {
       );
     }
   };
+
   return (
     <div className="col-md-12">
       <div className="card">

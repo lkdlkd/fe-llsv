@@ -9,13 +9,18 @@ const HistoryUser = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const limit = 10; // Số bản ghi trên mỗi trang
+  const token = localStorage.getItem('token'); // Hoặc cách lưu trữ khác
 
   // Hàm lấy dữ liệu phân trang
   const fetchHistory = async (page) => {
     setLoadingOrders(true);
     try {
       const response = await axios.get(
-        `${process.env.REACT_APP_URL}/api/user/history/${username}?page=${page}&limit=${limit}`
+        `${process.env.REACT_APP_URL}/api/user/history/${username}?page=${page}&limit=${limit}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        }
       );
       // Giả sử API trả về object: { history, currentPage, totalPages, totalItems }
       const { history: historyData, currentPage: cp, totalPages: tp } = response.data;

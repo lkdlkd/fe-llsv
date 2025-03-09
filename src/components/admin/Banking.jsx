@@ -17,6 +17,7 @@ function Banking() {
     });
     const [editing, setEditing] = useState(false);
     const [editId, setEditId] = useState(null);
+    const token = localStorage.getItem('token'); // Hoặc cách lưu trữ khác
 
     // Lấy danh sách ngân hàng khi component load
     useEffect(() => {
@@ -24,7 +25,11 @@ function Banking() {
     }, []);
 
     const fetchBanks = () => {
-        axios.get('http://localhost:5000/api/banks')
+        axios.get('http://localhost:5000/api/banks', {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+        })
             .then(response => setBanks(response.data))
             .catch(error => console.error("Error fetching bank info:", error));
     };
@@ -36,9 +41,13 @@ function Banking() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        if(editing) {
+        if (editing) {
             // Cập nhật ngân hàng hiện có
-            axios.put(`http://localhost:5000/api/banks/${editId}`, formData)
+            axios.put(`http://localhost:5000/api/banks/${editId}`, formData, {
+                headers: {
+                  'Authorization': `Bearer ${token}`
+                }
+            })
                 .then(response => {
                     fetchBanks();
                     setEditing(false);
@@ -48,7 +57,11 @@ function Banking() {
                 .catch(error => console.error("Error updating bank info:", error));
         } else {
             // Thêm ngân hàng mới
-            axios.post('http://localhost:5000/api/creatbank', formData)
+            axios.post('http://localhost:5000/api/creatbank', formData, {
+                headers: {
+                  'Authorization': `Bearer ${token}`
+                }
+            })
                 .then(response => {
                     fetchBanks();
                     resetForm();
@@ -88,7 +101,11 @@ function Banking() {
     };
 
     const handleDelete = (id) => {
-        axios.delete(`${process.env.REACT_APP_URL}/api/banks/${id}`)
+        axios.delete(`${process.env.REACT_APP_URL}/api/banks/${id}`, {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+        })
             .then(response => {
                 fetchBanks();
             })

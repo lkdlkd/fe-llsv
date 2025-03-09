@@ -11,6 +11,10 @@ function Profile() {
         const fetchuser = async () => {
             try {
                 const response = await axios.get(`${process.env.REACT_APP_URL}/api/user/${username}`, {
+                    headers: {
+                      'Authorization': `Bearer ${token}`
+                    }
+                  }, {
                     params: { username }  // Gửi userId tới API
                 });
                 setuser(response.data);

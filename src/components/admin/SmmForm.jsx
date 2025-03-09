@@ -11,6 +11,7 @@ const SmmForm = () => {
     status: "on",
     update_price: "on"
   });
+  const token = localStorage.getItem('token'); // Hoặc cách lưu trữ khác
 
   const [smmPartners, setSmmPartners] = useState([]); // Lưu danh sách đối tác
 
@@ -21,7 +22,11 @@ const SmmForm = () => {
 
   const fetchSmmPartners = async () => {
     try {
-      const response = await axios.get(`${process.env.REACT_APP_URL}/api/smm`);
+      const response = await axios.get(`${process.env.REACT_APP_URL}/api/smm`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
       setSmmPartners(response.data);
     } catch (error) {
       console.error("Lỗi khi tải danh sách đối tác:", error);
@@ -35,7 +40,15 @@ const SmmForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post(`${process.env.REACT_APP_URL}/api/smm`, formData);
+      await axios.post(
+        `${process.env.REACT_APP_URL}/api/smm/them`,
+        formData,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        }
+      );
       alert("Đã thêm đối tác thành công!");
       fetchSmmPartners(); // Cập nhật danh sách sau khi thêm
       setFormData({
@@ -54,7 +67,11 @@ const SmmForm = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`${process.env.REACT_APP_URL}/api/smm/${id}`);
+      await axios.delete(`${process.env.REACT_APP_URL}/api/smm/${id}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
       fetchSmmPartners(); // Cập nhật danh sách sau khi xóa
     } catch (error) {
       console.error("Lỗi khi xóa đối tác:", error);
@@ -133,41 +150,40 @@ const SmmForm = () => {
       </form>
       <h2 className="smm-list-title">Danh Sách Đối Tác SMM</h2>
 
-    <div className="rsp-table">
-  {/* Hiển thị danh sách đối tác */}
-      <table className="smm-table">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Tên</th>
-            <th>URL API</th>
-            <th>Trạng Thái</th>
-            <th>Cập Nhật Giá</th>
-            <th>Hành Động</th>
-          </tr>
-        </thead>
-        <tbody>
-          {smmPartners.map((partner, index) => (
-            <tr key={partner._id}>
-              <td>{index + 1}</td>
-              <td>{partner.name}</td>
-              <td>{partner.url_api}</td>
-              <td>{partner.status}</td>
-              <td>{partner.update_price}</td>
-              <td>
-                <button
-                  className="delete-btn"
-                  onClick={() => handleDelete(partner._id)}
-                >
-                  Xóa
-                </button>
-              </td>
+      <div className="rsp-table">
+        {/* Hiển thị danh sách đối tác */}
+        <table className="smm-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Tên</th>
+              <th>URL API</th>
+              <th>Trạng Thái</th>
+              <th>Cập Nhật Giá</th>
+              <th>Hành Động</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-    
+          </thead>
+          <tbody>
+            {smmPartners.map((partner, index) => (
+              <tr key={partner._id}>
+                <td>{index + 1}</td>
+                <td>{partner.name}</td>
+                <td>{partner.url_api}</td>
+                <td>{partner.status}</td>
+                <td>{partner.update_price}</td>
+                <td>
+                  <button
+                    className="delete-btn"
+                    onClick={() => handleDelete(partner._id)}
+                  >
+                    Xóa
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };

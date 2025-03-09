@@ -15,6 +15,7 @@ import HistoryUser from "./components/user/HistoryUser";
 import Naptien from "./components/user/Naptien";
 import Banking from "./components/admin/Banking";
 
+
 const getRole = () => {
   return localStorage.getItem("role") || "";
 };
@@ -42,22 +43,19 @@ function App() {
   return (
     <Router>
       <Routes>
+
         {/* Các trang không có Layout */}
         <Route path="/dang-nhap" element={<Login />} />
         <Route path="/dang-ky" element={<Register />} />
 
         {/* Các trang có Layout */}
-        <Route path="/" element={<Layout />}>
+        <Route path="/" element={token ? <Layout /> : <Navigate to="/dang-nhap" />}>
           <Route index element={<Home />} />
-          {/* <Route path="dichvu" element={!isAdmin() ? <Likefb /> : <Navigate to="/quantri" />} /> */}
-          {/* <Route path="sub-facebook" element={!isAdmin() ? <Likefb category={"SUB FB CÁ NHÂN + PRO5 + CHUYÊN NGHIỆP"} /> : <Navigate to="/quantri" />} />
-          <Route path="like-facebook" element={!isAdmin() ? <Likefb category={"LIKE BÀI VIẾT ( FB )"} /> : <Navigate to="/quantri" />} />
-          <Route path="view-tiktok" element={!isAdmin() ? <Likefb category={"VIEW VIDEO TIKTOK"} /> : <Navigate to="/quantri" />} />
-          <Route path="like-tiktok" element={!isAdmin() ? <Likefb category={"TYM VIDEO TIKTOK"} /> : <Navigate to="/quantri" />} /> */}
-          <Route path="dichvu" element={!isAdmin() ? <ServerFilterForm /> : <Navigate to="/quantri" />} />
-          <Route path="danh-sach-don" element={!isAdmin() ? <Danhsachdon /> : <Navigate to="/quantri" />} />
-          <Route path="lich-su-hoat-dong" element={!isAdmin() ? <HistoryUser /> : <Navigate to="/quantri" />} />
-          <Route path="nap-tien" element={!isAdmin() ? <Naptien /> : <Navigate to="/quantri" />} />
+        
+          <Route path="dichvu" element={token  ? <ServerFilterForm /> : <Navigate to="/quantri" />} />
+          <Route path="danh-sach-don" element={token ?<Danhsachdon /> : <Navigate to="/quantri" />} />
+          <Route path="lich-su-hoat-dong" element={token ? <HistoryUser /> : <Navigate to="/quantri" />} />
+          <Route path="nap-tien" element={token ? <Naptien /> : <Navigate to="/quantri" />} />
 
 
 

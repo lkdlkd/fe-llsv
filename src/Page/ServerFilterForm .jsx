@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "../style/muahang.scss";
+
 import "../dichvu.css";
 
 const ServerFilterForm = () => {
@@ -11,7 +12,8 @@ const ServerFilterForm = () => {
   // Sử dụng rawLink để lưu giá trị người dùng nhập, và convertedUID để lưu UID chuyển đổi (nếu có)
   const [rawLink, setRawLink] = useState("");
   const [convertedUID, setConvertedUID] = useState("");
-  const [serviceId, setServiceId] = useState("");
+  // Sử dụng selectedMagoi để lưu giá trị Magoi của dịch vụ được chọn
+  const [selectedMagoi, setSelectedMagoi] = useState("");
   // Sử dụng quantity khi dịch vụ không bật iscomment
   const [quantity, setQuantity] = useState(100);
   // Sử dụng comments khi dịch vụ bật iscomment
@@ -25,36 +27,42 @@ const ServerFilterForm = () => {
 
   const [min, setMin] = useState(100);
   const [max, setMax] = useState(10000);
+  const [rate, setRate] = useState(0);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const limit = 10;
 
   const username = localStorage.getItem("username");
+  const token = localStorage.getItem("token");
 
   // Lấy danh sách server từ API khi component load
   useEffect(() => {
     const fetchServers = async () => {
       try {
-        const response = await axios.get(`${process.env.REACT_APP_URL}/api/server`);
+        const response = await axios.get(`${process.env.REACT_APP_URL}/api/server`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
         setServers(response.data.data);
       } catch (error) {
         console.error("Lỗi khi tải danh sách server:", error);
       }
     };
     fetchServers();
-  }, []);
+  }, [token]);
 
   // Tạo danh sách type và category dựa theo danh sách server
   const uniqueTypes = Array.from(new Set(servers.map((server) => server.type)));
   const categoriesForType = selectedType
     ? Array.from(
-        new Set(
-          servers
-            .filter((server) => server.type === selectedType)
-            .map((server) => server.category)
-        )
+      new Set(
+        servers
+          .filter((server) => server.type === selectedType)
+          .map((server) => server.category)
       )
+    )
     : [];
 
   // Lọc danh sách server theo type và category đã chọn
@@ -64,17 +72,17 @@ const ServerFilterForm = () => {
       (selectedCategory ? server.category === selectedCategory : true)
   );
 
-  // Khi thay đổi type thì reset category, service đã chọn và tổng tiền
+  // Khi thay đổi type thì reset category, dịch vụ đã chọn và tổng tiền
   const handleTypeChange = (e) => {
     setSelectedType(e.target.value);
     setSelectedCategory("");
-    setServiceId("");
+    setSelectedMagoi("");
     setTotalCost(0);
   };
 
   const handleCategoryChange = (e) => {
     setSelectedCategory(e.target.value);
-    setServiceId("");
+    setSelectedMagoi("");
     setTotalCost(0);
   };
 
@@ -82,9 +90,9 @@ const ServerFilterForm = () => {
   // - Nếu không bật iscomment: tổng = rate * quantity.
   // - Nếu bật iscomment: tổng = (số dòng trong textarea, loại bỏ dòng trống) * rate.
   useEffect(() => {
-    if (serviceId) {
+    if (selectedMagoi) {
       const selectedService = filteredServers.find(
-        (service) => service.serviceId === serviceId
+        (service) => service.Magoi === selectedMagoi
       );
       if (selectedService) {
         if (selectedService.iscomment === "on") {
@@ -99,7 +107,7 @@ const ServerFilterForm = () => {
     } else {
       setTotalCost(0);
     }
-  }, [serviceId, quantity, filteredServers, comments]);
+  }, [selectedMagoi, quantity, filteredServers, comments]);
 
   // Chuyển đổi rawLink thành UID tự động sau 500ms debounce
   useEffect(() => {
@@ -139,32 +147,30 @@ const ServerFilterForm = () => {
     }
     // Sử dụng UID chuyển đổi nếu có, nếu không thì dùng rawLink gốc
     const finalLink = convertedUID || rawLink;
-    if (!finalLink || !serviceId) {
+    if (!finalLink || !selectedMagoi) {
       setMessage("Vui lòng chọn dịch vụ và nhập link.");
       return;
     }
 
     setIsSubmitting(true);
 
-    // Tìm dịch vụ được chọn
+    // Tìm dịch vụ được chọn dựa trên Magoi
     const selectedService = filteredServers.find(
-      (service) => service.serviceId === serviceId
+      (service) => service.Magoi === selectedMagoi
     );
 
-    // Chuẩn bị payload gửi lên API
+    // Chuẩn bị payload gửi lên API, sử dụng key "magoi" thay cho "serviceId"
     const payload = {
       link: finalLink,
       username,
       category: selectedCategory,
-      serviceId,
+      magoi: selectedMagoi,
       note,
     };
 
     // Nếu dịch vụ bật comment, tính số lượng bằng số dòng (loại bỏ dòng trống)
     if (selectedService && selectedService.iscomment === "on") {
-      const computedQty = comments
-        .split(/\r?\n/)
-        .filter((line) => line.trim() !== "").length;
+      const computedQty = comments.split(/\r?\n/).filter((line) => line.trim() !== "").length;
       payload.quantity = computedQty;
       payload.comments = comments;
     } else {
@@ -174,7 +180,12 @@ const ServerFilterForm = () => {
     try {
       const response = await axios.post(
         `${process.env.REACT_APP_URL}/api/order/add`,
-        payload
+        payload,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        }
       );
       setMessage("Mua dịch vụ thành công");
       setOrders((prevOrders) => [...prevOrders, response.data]);
@@ -226,7 +237,7 @@ const ServerFilterForm = () => {
               <form onSubmit={handleSubmit}>
                 {selectedType && selectedCategory && (
                   <>
-                                      <div className="form-group mb-3">
+                    <div className="form-group mb-3">
                       <label htmlFor="object_id" className="form-label">
                         <strong>Link Hoặc UID:</strong>
                       </label>
@@ -234,7 +245,6 @@ const ServerFilterForm = () => {
                         type="text"
                         value={displayLink}
                         onChange={(e) => {
-                          // Khi người dùng thay đổi, cập nhật rawLink và reset UID chuyển đổi
                           setRawLink(e.target.value);
                           setConvertedUID("");
                         }}
@@ -248,22 +258,27 @@ const ServerFilterForm = () => {
                       </label>
                       {filteredServers.map((server) => (
                         <div
-                          key={server.serviceId}
+                          key={server.Magoi}
                           className="form-check mb-2 d-flex align-items-center gap-2"
                         >
                           <input
+                            id={`server-${server.Magoi}`}
                             className="form-check-input"
                             type="radio"
                             name="server"
-                            value={server.serviceId}
-                            checked={serviceId === server.serviceId}
+                            value={server.Magoi}
+                            checked={selectedMagoi === server.Magoi}
                             onChange={(e) => {
-                              setServiceId(e.target.value);
+                              setSelectedMagoi(e.target.value);
                               setMin(server.min);
                               setMax(server.max);
+                              setRate(server.rate);
                             }}
                           />
-                          <label className="form-check-label">
+                          <label
+                            className="form-check-label"
+                            htmlFor={`server-${server.Magoi}`}
+                          >
                             <span className="badge bg-success">{server.maychu}</span>
                             <span>{server.name}</span>
                             <span className="badge bg-primary">
@@ -273,7 +288,7 @@ const ServerFilterForm = () => {
                               {server.trangthai ? "Hoạt động" : "Không hoạt động"}
                             </span>
                           </label>
-                          {serviceId === server.serviceId && (
+                          {selectedMagoi === server.Magoi && (
                             <div
                               className="server-description"
                               dangerouslySetInnerHTML={{ __html: server.description }}
@@ -282,11 +297,9 @@ const ServerFilterForm = () => {
                         </div>
                       ))}
                     </div>
-
                     {(() => {
-                      // Kiểm tra nếu dịch vụ được chọn bật iscomment
                       const selectedService = filteredServers.find(
-                        (service) => service.serviceId === serviceId
+                        (service) => service.Magoi === selectedMagoi
                       );
                       if (selectedService && selectedService.iscomment === "on") {
                         return (
@@ -336,7 +349,18 @@ const ServerFilterForm = () => {
                         placeholder="Ghi chú đơn hàng"
                       />
                     </div>
-                    <div className="form-group mb-3">
+                    <div class="form-group mb-3">
+                      <div class="alert bg-primary text-center text-white">
+                        <h3 class="alert-heading">Tổng thanh toán: <span class="text-danger">{Number(totalCost).toLocaleString("vi-VN")}
+                        </span>
+                          VNĐ</h3>
+                        <p class="fs-4 mb-0" id="text-order">Bạn sẽ tăng <span class="text-danger" >{quantity} </span>
+                          số
+                          lượng với giá <span class="text-danger" >{rate}</span> đ</p>
+                      </div>
+                    </div>
+
+                    {/* <div className="form-group mb-3">
                       <div className="alert bg-primary text-center text-white">
                         <h3 className="alert-heading">
                           Tổng thanh toán:{" "}
@@ -346,12 +370,11 @@ const ServerFilterForm = () => {
                           VNĐ
                         </h3>
                       </div>
-                    </div>
+                    </div> */}
                     <div className="form-group">
                       <button
                         type="submit"
-                        className="btn btn-primary w-100 d-flex align-items-center justify-content-center gap-2"
-                      >
+                        class="btn btn-primary w-100 d-flex align-items-center justify-content-center gap-2">
                         <i className="fas fa-shopping-cart"></i>
                         <span>Tạo đơn hàng</span>
                       </button>
@@ -366,9 +389,7 @@ const ServerFilterForm = () => {
                     <div className="spinner load"></div>
                     <p>Đang mua đơn</p>
                   </div>
-
                 </div>
-                
               )}
             </div>
           </div>

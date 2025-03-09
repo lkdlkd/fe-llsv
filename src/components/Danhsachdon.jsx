@@ -17,19 +17,27 @@ const Danhsachdon = () => {
   const limit = 10; // Số đơn hàng mỗi trang
 
   const username = localStorage.getItem("username");
+  const token = localStorage.getItem("token"); // Hoặc cách lưu trữ khác
 
   // Lấy danh sách server từ API khi component load
   useEffect(() => {
     const fetchServers = async () => {
       try {
-        const response = await axios.get(`${process.env.REACT_APP_URL}/api/server`);
+        const response = await axios.get(
+          `${process.env.REACT_APP_URL}/api/server`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
         setServers(response.data.data);
       } catch (error) {
         console.error("Lỗi khi tải danh sách server:", error);
       }
     };
     fetchServers();
-  }, []);
+  }, [token]);
 
   // Tạo danh sách type và category dựa theo danh sách server
   const uniqueTypes = Array.from(new Set(servers.map((server) => server.type)));
@@ -53,7 +61,7 @@ const Danhsachdon = () => {
     setSelectedCategory(e.target.value);
   };
 
-  // Hàm lấy đơn hàng: sử dụng endpoint tìm kiếm, trong đó nếu selectedCategory rỗng sẽ không truyền điều kiện đó
+  // Hàm lấy đơn hàng: nếu selectedCategory rỗng thì không truyền điều kiện đó
   const fetchOrders = async () => {
     if (!username) {
       setLoadingOrders(false);
@@ -61,15 +69,21 @@ const Danhsachdon = () => {
     }
     setLoadingOrders(true);
     try {
-      const response = await axios.get(`${process.env.REACT_APP_URL}/api/order/screach`, {
-        params: {
-          username,
-          ...(selectedCategory && { category: selectedCategory }),
-          page: currentPage,
-          limit,
-          search: searchTerm,
-        },
-      });
+      const response = await axios.get(
+        `${process.env.REACT_APP_URL}/api/order/screach`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          params: {
+            username,
+            ...(selectedCategory && { category: selectedCategory }),
+            page: currentPage,
+            limit,
+            search: searchTerm,
+          },
+        }
+      );
       // Giả sử API trả về object { orders, currentPage, totalPages, totalOrders }
       setOrders(response.data.orders);
       setCurrentPage(response.data.currentPage);
@@ -86,14 +100,14 @@ const Danhsachdon = () => {
     }
   };
 
-  // Khi nhấn nút tìm kiếm, đặt lại trang về 1 và gọi fetchOrders
+  // Khi nhấn nút tìm kiếm, reset trang về 1 và gọi fetchOrders
   const handleSearch = (e) => {
     e.preventDefault();
     setCurrentPage(1);
     fetchOrders();
   };
 
-  // Gọi lại fetchOrders mỗi khi thay đổi selectedCategory hoặc currentPage
+  // Gọi lại fetchOrders mỗi khi thay đổi username, selectedCategory hoặc currentPage
   useEffect(() => {
     fetchOrders();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -110,7 +124,7 @@ const Danhsachdon = () => {
               <input
                 type="text"
                 className="form-control"
-                placeholder="Tìm kiếm dữ liệu.."
+                placeholder="Tìm kiếm dữ liệu..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -136,7 +150,10 @@ const Danhsachdon = () => {
             {selectedType && (
               <>
                 <label>PHÂN LOẠI:</label>
-                <select value={selectedCategory} onChange={handleCategoryChange}>
+                <select
+                  value={selectedCategory}
+                  onChange={handleCategoryChange}
+                >
                   <option value="">Other</option>
                   {categoriesForType.map((category, index) => (
                     <option key={index} value={category}>
@@ -170,7 +187,9 @@ const Danhsachdon = () => {
                         <th>Server</th>
                         <th>Số lượng</th>
                         <th>Trạng thái</th>
-                        {selectedCategory === "BÌNH LUẬN" && <th>Bình luận</th>}
+                        {selectedCategory === "BÌNH LUẬN" && (
+                          <th>Bình luận</th>
+                        )}
                         <th>Ghi chú</th>
                         <th>Ngày tạo</th>
                       </tr>
@@ -193,7 +212,9 @@ const Danhsachdon = () => {
                             </td>
                           )}
                           <td>{order.note}</td>
-                          <td>{new Date(order.createdAt).toLocaleString()}</td>
+                          <td>
+                            {new Date(order.createdAt).toLocaleString()}
+                          </td>
                         </tr>
                       ))}
                     </tbody>
@@ -213,7 +234,9 @@ const Danhsachdon = () => {
                       </span>
                       <button
                         onClick={() =>
-                          setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                          setCurrentPage((prev) =>
+                            Math.min(prev + 1, totalPages)
+                          )
                         }
                         disabled={currentPage === totalPages}
                       >
