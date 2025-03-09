@@ -14,6 +14,13 @@ import Alldon from "./components/admin/Alldon";
 import HistoryUser from "./components/user/HistoryUser";
 import Naptien from "./components/user/Naptien";
 import Banking from "./components/admin/Banking";
+import devtools from "devtools-detect";
+document.addEventListener("contextmenu", (event) => event.preventDefault());
+document.addEventListener("keydown", (event) => {
+  if (event.key === "F12" || (event.ctrlKey && event.shiftKey && event.key === "I")) {
+    event.preventDefault();
+  }
+});
 
 (function () {
   debugger;  // Khi DevTools mở, trình duyệt sẽ dừng lại ở đây
@@ -32,7 +39,16 @@ const getToken = () => {
 function App() {
   const [role, setRole] = useState(getRole());
   const [token, setToken] = useState(getToken());
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (devtools.isOpen) {
+        alert("Phát hiện DevTools! Trang sẽ bị vô hiệu hóa.");
+        window.location.href = "about:blank"; // Điều hướng đến trang trống
+      }
+    }, 1000);
 
+    return () => clearInterval(interval); // Xóa interval khi component unmount
+  }, []);
   useEffect(() => {
     const handleStorageChange = () => {
       setRole(getRole());

@@ -62,7 +62,7 @@ function MenuUser() {
         <div className="m-header">
           <a href="/" className="b-brand text-primary">
             {/* ========   Change your logo from here   ============ */}
-            <span>LIKESUBVIET</span>
+            <span>WEB CHÍNH SUBVIET.VN</span>
           </a>
         </div>
         <div className="navbar-content mb-3">
@@ -79,7 +79,7 @@ function MenuUser() {
                 <span className="pc-mtext">Trang Quản Trị</span>
               </a>
             </li> */}
-
+            
             <li className="pc-item pc-caption">
               <label>Bảng Điều Khiển</label>
             </li>
@@ -99,7 +99,7 @@ function MenuUser() {
                   <li className="pc-item">
                     <a href="/" className="pc-link">
                       <span className="pc-micon">
-                        <img src="assets/pack-lbd/images/home.png" className="wid-35" alt="" />
+                        <img src="/home.png" className="wid-35" alt="" />
                       </span>
                       <span className="pc-mtext">Trang Chủ</span>
                     </a>
@@ -115,7 +115,7 @@ function MenuUser() {
                   <li className="pc-item">
                     <a href="/nap-tien" className="pc-link">
                       <span className="pc-micon">
-                        <img src="assets/pack-lbd/images/payment-method.png" className="wid-35" alt="" />
+                        <img src="/payment-method.png" className="wid-35" alt="" />
                       </span>
                       <span className="pc-mtext">Nạp Tiền</span>
                     </a>
@@ -123,7 +123,7 @@ function MenuUser() {
                   <li className="pc-item">
                     <a href="/lich-su-hoat-dong" className="pc-link">
                       <span className="pc-micon">
-                        <img src="assets/pack-lbd/images/transactions.png" className="wid-35" alt="" />
+                        <img src="/transactions.png" className="wid-35" alt="" />
                       </span>
                       <span className="pc-mtext">Lịch Sử Hoạt Động</span>
                     </a>
@@ -139,11 +139,11 @@ function MenuUser() {
                 </ul>
               )}
             </li>
-
+            
             <li className="pc-item pc-caption">
               <label>Danh Sách Dịch Vụ</label>
             </li>
-
+            
             <li className="pc-item pc-hasmenu">
               <a href="dichvu" className="pc-link">
                 <span className="pc-micon">
@@ -166,16 +166,12 @@ function MenuUser() {
                 </span>
               </a>
             </li>
-            <li className="pc-item pc-hasmenu">
-              <Logout />
-
-            </li>
           </ul>
-
+          <Logout />
         </div>
       </div>
     </nav>
   );
 }
 
-export default MenuUser;  
+export default MenuUser;
