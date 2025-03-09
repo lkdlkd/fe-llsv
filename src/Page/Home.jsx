@@ -105,7 +105,7 @@ function Home() {
                 </div>
               </div>
               <div className="flex-grow-1 ms-3">
-                <h4 className="mb-0">{user.role}</h4>
+                <h4 className="mb-0">{user.capbac}</h4>
                 <h6 className="mb-0">Cấp bậc</h6>
               </div>
             </div>

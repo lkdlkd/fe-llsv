@@ -1,79 +1,108 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
 import { FaUser, FaLock } from 'react-icons/fa';
 import '../App.css';
+import { AuthContext } from './AuthContext';
 
 export const Login = () => {
   const navigate = useNavigate();
+  const { updateAuth } = useContext(AuthContext);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [animationClass, setAnimationClass] = useState('fade-in');
 
-  
   const handleLogin = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setAnimationClass('fade-out');
+
     try {
-      const response = await axios.post(`${process.env.REACT_APP_URL}/api/user/login`, { username, password });
+      const response = await axios.post(
+        `${process.env.REACT_APP_URL}/api/user/login`,
+        { username, password }
+      );
       const { token, role } = response.data;
       localStorage.setItem('token', token);
       localStorage.setItem('role', role);
       localStorage.setItem('username', username);
-      // Chuyển hướng dựa trên vai trò
-      if (role === "admin") {
-        navigate('/quantri');
-      } else {
-        navigate('/');
-      }
+
+      // Cập nhật thông tin đăng nhập trong context
+      updateAuth({ token, role, username });
+
+      setTimeout(() => {
+        setLoading(false);
+        if (role === 'admin') {
+          navigate('/quantri');
+        } else if (role === 'user') {
+          navigate('/home');
+        }
+      }, 800);
     } catch (err) {
+      setLoading(false);
+      setAnimationClass('fade-in');
       if (err.response) {
-        console.error("Lỗi từ server:", err.response.data);
-        setError(err.response.data.message || "Đăng nhập thất bại");
+        setError(err.response.data.message || 'Đăng nhập thất bại');
       } else {
-        console.error("Lỗi không xác định:", err);
-        setError("Lỗi kết nối đến máy chủ");
+        setError('Lỗi kết nối đến máy chủ');
       }
     }
   };
 
   return (
-    <div className="login-form">
-      <h2>Đăng nhập</h2>
-      {error && <div className="error-message">{error}</div>}
-      <form onSubmit={handleLogin}>
-        <div className="input-group">
-          <FaUser className="icon" />
-          <input
-            type="text"
-            placeholder="Tài khoản"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-          />
+    <>
+      {loading && (
+        <div className="spinner-overlay">
+          <div className="spinner"></div>
         </div>
-        <div className="input-group">
-          <FaLock className="icon" />
-          <input
-            type="password"
-            placeholder="Mật khẩu"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
+      )}
+      <div className={`container ${animationClass}`}>
+        <div className="illustration">
+          <img src="/login-page-img.png" alt="banner" />
         </div>
-        <div className="options">
-          <label>
-            <input type="checkbox" />
-            Nhớ tài khoản
-          </label>
-          <Link to="/quen-mat-khau">Quên mật khẩu?</Link>
+        <div className="login-form">
+          <h2>Đăng nhập</h2>
+          {error && <div className="error-message">{error}</div>}
+          <form onSubmit={handleLogin}>
+            <div className="input-group">
+              <FaUser className="icon" />
+              <input
+                type="text"
+                name="username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="Tài khoản"
+              />
+            </div>
+            <div className="input-group">
+              <FaLock className="icon" />
+              <input
+                type="password"
+                name="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Mật khẩu"
+              />
+            </div>
+            <div className="options">
+              <label>
+                <input type="checkbox" />
+                Nhớ tài khoản
+              </label>
+              <Link to="#">Quên mật khẩu?</Link>
+            </div>
+            <button type="submit" className="login-button">
+              Đăng nhập
+            </button>
+          </form>
+          <div className="divider">HOẶC</div>
+          <button className="create-account-button">
+            <Link to="/dang-ky">Chưa có tài khoản</Link>
+          </button>
         </div>
-        <button type="submit" className="login-button">
-          Đăng nhập
-        </button>
-      </form>
-      <div className="divider">HOẶC</div>
-      <button className="create-account-button">
-        <Link to="/dang-ky">Tạo tài khoản mới</Link>
-      </button>
-    </div>
+      </div>
+    </>
   );
 };

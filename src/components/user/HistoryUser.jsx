@@ -17,10 +17,10 @@ const HistoryUser = () => {
     try {
       const response = await axios.get(
         `${process.env.REACT_APP_URL}/api/user/history/${username}?page=${page}&limit=${limit}`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
+        headers: {
+          'Authorization': `Bearer ${token}`
         }
+      }
       );
       // Giả sử API trả về object: { history, currentPage, totalPages, totalItems }
       const { history: historyData, currentPage: cp, totalPages: tp } = response.data;
@@ -80,18 +80,33 @@ const HistoryUser = () => {
                           >
                             {item.tienhientai}
                           </span>{" "}
-                          -
-                          <span
-                            className="badge"
-                            style={{ backgroundColor: "#e53935" }}
-                          >
-                            {item.tongtien}
-                          </span>{" "}
+                          {item.hanhdong === "Cộng tiền" ? (
+                            <>
+                              +
+                              <span
+                                className="badge"
+                                style={{ backgroundColor: "#e53935" }}
+                              >
+                                {item.tongtien}
+                              </span>{" "}
+                            </>
+                          ) : (
+                            <>
+                              -
+                              <span
+                                className="badge"
+                                style={{ backgroundColor: "#e53935" }}
+                              >
+                                {item.tongtien}
+                              </span>{" "}
+                            </>
+                          )}
                           ={" "}
                           <span className="badge bg-success">
                             {item.tienconlai}
                           </span>
                         </td>
+
                         <td>{new Date(item.createdAt).toLocaleString()}</td>
                         <td>{item.mota || "-"}</td>
                       </tr>

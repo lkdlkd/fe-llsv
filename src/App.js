@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect ,useContext} from "react";
+
 import { Navigate, Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import { Login } from "./components/Login";
 import Register from "./components/Register";
@@ -15,18 +16,20 @@ import HistoryUser from "./components/user/HistoryUser";
 import Naptien from "./components/user/Naptien";
 import Banking from "./components/admin/Banking";
 import devtools from "devtools-detect";
-document.addEventListener("contextmenu", (event) => event.preventDefault());
-document.addEventListener("keydown", (event) => {
-  if (event.key === "F12" || (event.ctrlKey && event.shiftKey && event.key === "I")) {
-    event.preventDefault();
-  }
-});
+import { AuthContext, AuthProvider } from "./components/AuthContext";
 
-(function () {
-  debugger;  // Khi DevTools mở, trình duyệt sẽ dừng lại ở đây
-  // Thêm các lệnh khác ở đây
-  console.log("Hàm đã chạy");
-})();
+// document.addEventListener("contextmenu", (event) => event.preventDefault());
+// document.addEventListener("keydown", (event) => {
+//   if (event.key === "F12" || (event.ctrlKey && event.shiftKey && event.key === "I")) {
+//     event.preventDefault();
+//   }
+// });
+
+// (function () {
+//   debugger;  // Khi DevTools mở, trình duyệt sẽ dừng lại ở đây
+//   // Thêm các lệnh khác ở đây
+//   console.log("Hàm đã chạy");
+// })();
 
 const getRole = () => {
   return localStorage.getItem("role") || "";
@@ -39,16 +42,18 @@ const getToken = () => {
 function App() {
   const [role, setRole] = useState(getRole());
   const [token, setToken] = useState(getToken());
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (devtools.isOpen) {
-        alert("Phát hiện DevTools! Trang sẽ bị vô hiệu hóa.");
-        window.location.href = "about:blank"; // Điều hướng đến trang trống
-      }
-    }, 1000);
-
-    return () => clearInterval(interval); // Xóa interval khi component unmount
-  }, []);
+  
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     if (devtools.isOpen) {
+  //       alert("Phát hiện DevTools! Trang sẽ bị vô hiệu hóa.");
+  //       window.location.href = "*"; // Điều hướng đến trang trống
+  //     }
+  //   }, 1000);
+  
+  //   return () => clearInterval(interval); // Xóa interval khi component unmount
+  // }, []);
+  
   useEffect(() => {
     const handleStorageChange = () => {
       setRole(getRole());
@@ -59,26 +64,26 @@ function App() {
     return () => window.removeEventListener("storage", handleStorageChange);
   }, []);
 
-  const isAdmin = () => token && role === "admin";
+  // const isAdmin = () => token && role === "admin";
+  const { auth } = useContext(AuthContext);
 
+  const isAdmin = () => auth.token && auth.role === "admin";
   return (
     <Router>
       <Routes>
-
-        {/* Các trang không có Layout */}
+        {/* Routes without Layout */}
         <Route path="/dang-nhap" element={<Login />} />
         <Route path="/dang-ky" element={<Register />} />
 
-        {/* Các trang có Layout */}
-        <Route path="/" element={token ? <Layout /> : <Navigate to="/dang-nhap" />}>
-          <Route index element={<Home />} />
-
+        {/* Routes with Layout */}
+        <Route path="/" element={auth.token ? <Layout /> : <Navigate to="/dang-nhap" />}>
+          {/* Redirect root to /home */}
+          <Route index element={<Navigate to="/home" replace />} />
+          <Route path="home" element={<Home />} />
           <Route path="dichvu" element={token ? <ServerFilterForm /> : <Navigate to="/quantri" />} />
           <Route path="danh-sach-don" element={token ? <Danhsachdon /> : <Navigate to="/quantri" />} />
           <Route path="lich-su-hoat-dong" element={token ? <HistoryUser /> : <Navigate to="/quantri" />} />
           <Route path="nap-tien" element={token ? <Naptien /> : <Navigate to="/quantri" />} />
-
-
 
           <Route path="quantri" element={isAdmin() ? <Quantri /> : <Navigate to="/dang-nhap" />} />
           <Route path="quantri/doitac" element={isAdmin() ? <SmmForm /> : <Navigate to="/dang-nhap" />} />
@@ -87,15 +92,17 @@ function App() {
           <Route path="quantri/tai-khoan" element={isAdmin() ? <UserList /> : <Navigate to="/dang-nhap" />} />
           <Route path="quantri/danhsachdon" element={isAdmin() ? <Alldon /> : <Navigate to="/dang-nhap" />} />
           <Route path="quantri/bank-king" element={isAdmin() ? <Banking /> : <Navigate to="/dang-nhap" />} />
-
-
         </Route>
 
-        {/* Trang 404 */}
+        {/* 404 Not Found */}
         <Route path="*" element={<h1>404 - Không tìm thấy trang</h1>} />
       </Routes>
     </Router>
   );
 }
 
-export default App;
+export default () => (
+  <AuthProvider>
+    <App />
+  </AuthProvider>
+);
