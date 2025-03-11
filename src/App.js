@@ -29,7 +29,7 @@ document.addEventListener("keydown", (event) => {
 (function () {
   debugger;  // Khi DevTools mở, trình duyệt sẽ dừng lại ở đây
   // Thêm các lệnh khác ở đây
-  console.log("Hàm đã chạy");
+  // console.log("Hàm đã chạy");
 })();
 
 const getRole = () => {
