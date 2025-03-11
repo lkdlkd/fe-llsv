@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import { fetchServers, fetchOrders, deleteOrder } from "../../utils/apiAdmin";
+import axios from "axios"; // Nếu bạn vẫn cần sử dụng axios cho một số trường hợp khác
+// import "../../App.css"; // Import file CSS nếu cần
 
 const Alldon = () => {
   const [servers, setServers] = useState([]);
@@ -19,23 +21,19 @@ const Alldon = () => {
   const [totalPages, setTotalPages] = useState(1);
   const limit = 10; // Số đơn hàng mỗi trang
 
-  const token = localStorage.getItem('token'); // Lấy token từ localStorage
+  const token = localStorage.getItem("token");
 
-  // Lấy danh sách server từ API khi component load
+  // Lấy danh sách server khi component load
   useEffect(() => {
-    const fetchServers = async () => {
+    const loadServers = async () => {
       try {
-        const response = await axios.get(`${process.env.REACT_APP_URL}/api/server`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-        setServers(response.data.data);
+        const data = await fetchServers(token);
+        setServers(data);
       } catch (error) {
         console.error("Lỗi khi tải danh sách server:", error);
       }
     };
-    fetchServers();
+    loadServers();
   }, [token]);
 
   // Tạo danh sách type và category dựa theo danh sách server
@@ -71,68 +69,43 @@ const Alldon = () => {
     setTotalCost(0);
   };
 
-  // Lấy danh sách đơn hàng của người dùng theo category đã chọn
+  // Lấy danh sách đơn hàng dựa vào category đã chọn, page hiện tại, và limit
   useEffect(() => {
-    const fetchOrders = async () => {
+    const loadOrders = async () => {
       if (!selectedCategory) {
         setLoadingOrders(false);
         return;
       }
       try {
-        const response = await axios.get(
-          `${process.env.REACT_APP_URL}/api/order/getOrder`,
-          {
-            headers: {
-              'Authorization': `Bearer ${token}`
-            },
-            params: { category: selectedCategory, page: currentPage, limit }
-          }
-        );
-        // Giả sử API trả về object { orders, currentPage, totalPages, totalOrders }
-        setOrders(response.data.orders);
-        setCurrentPage(response.data.currentPage);
-        setTotalPages(response.data.totalPages);
+        const data = await fetchOrders(token, selectedCategory, currentPage, limit);
+        setOrders(data.orders);
+        setCurrentPage(data.currentPage);
+        setTotalPages(data.totalPages);
       } catch (error) {
         setMessage(
-          error.response
-            ? error.response.data.message
-            : "Có lỗi xảy ra, vui lòng thử lại!"
+          error.message || "Có lỗi xảy ra, vui lòng thử lại!"
         );
       } finally {
         setLoadingOrders(false);
       }
     };
-    fetchOrders();
+    loadOrders();
   }, [selectedCategory, currentPage, token]);
 
   // Hàm xử lý xóa đơn hàng
   const handleDelete = async (orderId) => {
     if (!window.confirm("Bạn có chắc chắn muốn xóa đơn hàng này không?")) return;
     try {
-      await axios.delete(`${process.env.REACT_APP_URL}/api/order/${orderId}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
+      await deleteOrder(token, orderId);
       setMessage("Xóa đơn hàng thành công!");
       // Làm mới lại danh sách đơn hàng sau khi xóa
-      const response = await axios.get(
-        `${process.env.REACT_APP_URL}/api/order/getOrder`,
-        {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          },
-          params: { category: selectedCategory, page: currentPage, limit }
-        }
-      );
-      setOrders(response.data.orders);
-      setCurrentPage(response.data.currentPage);
-      setTotalPages(response.data.totalPages);
+      const data = await fetchOrders(token, selectedCategory, currentPage, limit);
+      setOrders(data.orders);
+      setCurrentPage(data.currentPage);
+      setTotalPages(data.totalPages);
     } catch (error) {
       setMessage(
-        error.response
-          ? error.response.data.message
-          : "Có lỗi xảy ra, vui lòng thử lại!"
+        error.message || "Có lỗi xảy ra, vui lòng thử lại!"
       );
     }
   };

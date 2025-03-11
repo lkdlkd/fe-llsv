@@ -1,10 +1,22 @@
 import "../../App.css";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 
 function AdminMenu() {
     const [activeMenu, setActiveMenu] = useState(null); // Lưu menu nào đang mở
+    useEffect(() => {
+      const handleClickOutside = (e) => {
+        if (window.innerWidth <= 1024) {
+          const sidebar = document.querySelector(".pc-sidebar");
+          if (sidebar && !sidebar.contains(e.target)) {
+            sidebar.classList.remove("open");
+          }
+        }
+      };
   
+      document.addEventListener("click", handleClickOutside);
+      return () => document.removeEventListener("click", handleClickOutside);
+    }, []);
     // Hàm chung để toggle menu
     const toggleMenu = (menuName) => { 
         setActiveMenu(activeMenu === menuName ? null : menuName);

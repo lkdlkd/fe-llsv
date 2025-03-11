@@ -1,6 +1,13 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import "../../SmmForm.css"; // Import file CSS riêng
+import { 
+  fetchSmmPartners, 
+  fetchServers, 
+  addServerService, 
+  updateServerService, 
+  deleteServerService 
+} from "../../utils/apiAdmin";
+import axios from 'axios';
 
 const Smmdv = () => {
   const [formData, setFormData] = useState({
@@ -9,7 +16,7 @@ const Smmdv = () => {
     description: "",
     maychu: "",
     getid: "off",
-    comment: "off", // mặc định tắt (off)
+    comment: "off",
     reaction: "off",
     matlive: "off",
     min: "",
@@ -23,40 +30,32 @@ const Smmdv = () => {
     isActive: true,
     category: ""
   });
-  const token = localStorage.getItem("token"); // Hoặc cách lưu trữ khác
+  const token = localStorage.getItem("token");
 
   const [smmPartners, setSmmPartners] = useState([]);
-  const [services, setServices] = useState([]);
-  const [server, setServer] = useState([]);
+  const [services, setServices] = useState([]); // Dữ liệu từ API bên SMM sẽ lấy về làm danh sách dịch vụ (nếu cần)
+  const [server, setServer] = useState([]); // Danh sách dịch vụ SMM (server)
   const [editMode, setEditMode] = useState(false); // Chế độ sửa hay thêm mới
   const [editService, setEditService] = useState(null); // Lưu thông tin dịch vụ cần sửa
 
   useEffect(() => {
-    fetchSmmPartners();
-    fetchServer();
+    loadSmmPartners();
+    loadServers();
   }, []);
 
-  const fetchSmmPartners = async () => {
+  const loadSmmPartners = async () => {
     try {
-      const response = await axios.get(`${process.env.REACT_APP_URL}/api/smm`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-      setSmmPartners(response.data);
+      const data = await fetchSmmPartners(token);
+      setSmmPartners(data);
     } catch (error) {
       console.error("Lỗi khi tải danh sách đối tác:", error);
     }
   };
 
-  const fetchServer = async () => {
+  const loadServers = async () => {
     try {
-      const response = await axios.get(`${process.env.REACT_APP_URL}/api/server`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-      setServer(response.data.data);
+      const data = await fetchServers(token);
+      setServer(data);
     } catch (error) {
       console.error("Lỗi khi tải danh sách máy chủ:", error);
     }
@@ -71,32 +70,37 @@ const Smmdv = () => {
     try {
       if (editMode) {
         // Sửa dịch vụ
-        await axios.put(
-          `${process.env.REACT_APP_URL}/api/server/update/${editService.id}`,
-          formData,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`
-            }
-          }
-        );
+        await updateServerService(editService.id, formData, token);
         alert("Đã sửa dịch vụ thành công!");
       } else {
         // Thêm mới dịch vụ
-        await axios.post(
-          `${process.env.REACT_APP_URL}/api/server/add`,
-          formData,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`
-            }
-          }
-        );
+        await addServerService(formData, token);
         alert("Đã thêm dịch vụ thành công!");
       }
-      fetchSmmPartners(); // Cập nhật lại danh sách sau khi thêm/sửa
+      loadServers(); // Cập nhật lại danh sách sau khi thêm/sửa
       setEditMode(false);
       setEditService(null);
+      // Reset form nếu cần
+      setFormData({
+        type: "",
+        name: "",
+        description: "",
+        maychu: "",
+        getid: "off",
+        comment: "off",
+        reaction: "off",
+        matlive: "off",
+        min: "",
+        max: "",
+        rate: "",
+        DomainSmm: "",
+        Linkdv: "",
+        serviceId: "",
+        serviceName: "",
+        Magoi: "",
+        isActive: true,
+        category: ""
+      });
     } catch (error) {
       console.error("Lỗi khi xử lý dữ liệu:", error);
       alert("Có lỗi xảy ra!");
@@ -119,7 +123,11 @@ const Smmdv = () => {
       Linkdv: serverItem.Linkdv,
       comment: serverItem.comment,
       reaction: serverItem.reaction,
-      matlive: serverItem.matlive
+      matlive: serverItem.matlive,
+      category: serverItem.category,
+      type: serverItem.type,
+      description: serverItem.description,
+      isActive: serverItem.isActive
     };
     console.log(newFormData);
     setFormData(newFormData);
@@ -127,17 +135,14 @@ const Smmdv = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`${process.env.REACT_APP_URL}/api/server/delete/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-      fetchSmmPartners();
+      await deleteServerService(id, token);
+      loadServers();
     } catch (error) {
       console.error("Lỗi khi xóa dịch vụ:", error);
     }
   };
 
+  // Nếu bạn cần xử lý lấy danh sách dịch vụ từ đối tác SMM bên thứ 3 theo DomainSmm
   const handleDomainChange = async (e) => {
     const domain = e.target.value;
     setFormData({ ...formData, DomainSmm: domain, serviceId: "", serviceName: "" });

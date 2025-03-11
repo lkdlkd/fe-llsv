@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import UserEdit from "./UserEdit";
 import AddBalanceForm from "./AddBalanceForm";
-import "../../style/UserList.css";  // Import file CSS
+import "../../style/UserList.css"; // Import file CSS
+import { getUsers, deleteUserById } from "../../utils/apiAdmin";
 
 const UserList = () => {
   const [users, setUsers] = useState([]);
@@ -13,20 +13,17 @@ const UserList = () => {
   const [editingUser, setEditingUser] = useState(null);
   const [balanceUser, setBalanceUser] = useState(null);
 
+  const token = localStorage.getItem("token");
+
   useEffect(() => {
     fetchUsers();
   }, [page]);
-  const token = localStorage.getItem('token'); // Hoặc cách lưu trữ khác
 
   const fetchUsers = async () => {
     try {
-      const response = await axios.get(`${process.env.REACT_APP_URL}/api/user?page=${page}&limit=10`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      setUsers(response.data.users);
-      setTotalPages(response.data.totalPages);
+      const data = await getUsers(page, 10, token);
+      setUsers(data.users);
+      setTotalPages(data.totalPages);
     } catch (error) {
       toast.error("Lỗi khi tải danh sách người dùng");
     }
@@ -35,12 +32,7 @@ const UserList = () => {
   const deleteUser = async (id) => {
     if (!window.confirm("Bạn có chắc muốn xóa người dùng này?")) return;
     try {
-      await axios.delete(`${process.env.REACT_APP_URL}/api/user/delete/${id}`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        }
-      );
+      await deleteUserById(id, token);
       toast.success("Xóa thành công!");
       fetchUsers();
     } catch (error) {
@@ -70,11 +62,17 @@ const UserList = () => {
               <td>{user.role}</td>
               <td>{user.balance} VNĐ</td>
               <td>
-                <button className="btn-add-balance" onClick={() => setBalanceUser(user)}>Cộng tiền</button>
+                <button className="btn-add-balance" onClick={() => setBalanceUser(user)}>
+                  Cộng tiền
+                </button>
               </td>
               <td>
-                <button className="btn-edit" onClick={() => setEditingUser(user)}>Sửa</button>
-                <button className="btn-delete" onClick={() => deleteUser(user._id)}>Xóa</button>
+                <button className="btn-edit" onClick={() => setEditingUser(user)}>
+                  Sửa
+                </button>
+                <button className="btn-delete" onClick={() => deleteUser(user._id)}>
+                  Xóa
+                </button>
               </td>
             </tr>
           ))}
@@ -82,17 +80,31 @@ const UserList = () => {
       </table>
 
       <div className="pagination">
-        <button onClick={() => setPage(page - 1)} disabled={page === 1}>Trước</button>
-        <span>Trang {page} / {totalPages}</span>
-        <button onClick={() => setPage(page + 1)} disabled={page === totalPages}>Tiếp</button>
+        <button onClick={() => setPage(page - 1)} disabled={page === 1}>
+          Trước
+        </button>
+        <span>
+          Trang {page} / {totalPages}
+        </span>
+        <button onClick={() => setPage(page + 1)} disabled={page === totalPages}>
+          Tiếp
+        </button>
       </div>
 
       {editingUser && (
-        <UserEdit user={editingUser} onClose={() => setEditingUser(null)} onUserUpdated={fetchUsers} />
+        <UserEdit
+          user={editingUser}
+          onClose={() => setEditingUser(null)}
+          onUserUpdated={fetchUsers}
+        />
       )}
 
       {balanceUser && (
-        <AddBalanceForm user={balanceUser} onClose={() => setBalanceUser(null)} onUserUpdated={fetchUsers} />
+        <AddBalanceForm
+          user={balanceUser}
+          onClose={() => setBalanceUser(null)}
+          onUserUpdated={fetchUsers}
+        />
       )}
     </div>
   );

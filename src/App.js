@@ -17,6 +17,7 @@ import Naptien from "./components/user/Naptien";
 import Banking from "./components/admin/Banking";
 import devtools from "devtools-detect";
 import { AuthContext, AuthProvider } from "./components/AuthContext";
+import Profile from "./components/user/Profile";
 
 document.addEventListener("contextmenu", (event) => event.preventDefault());
 document.addEventListener("keydown", (event) => {
@@ -84,6 +85,7 @@ function App() {
           <Route path="danh-sach-don" element={token ? <Danhsachdon /> : <Navigate to="/quantri" />} />
           <Route path="lich-su-hoat-dong" element={token ? <HistoryUser /> : <Navigate to="/quantri" />} />
           <Route path="nap-tien" element={token ? <Naptien /> : <Navigate to="/quantri" />} />
+          <Route path="profile" element={token ? <Profile /> : <Navigate to="/quantri" />} />
 
           <Route path="quantri" element={isAdmin() ? <Quantri /> : <Navigate to="/dang-nhap" />} />
           <Route path="quantri/doitac" element={isAdmin() ? <SmmForm /> : <Navigate to="/dang-nhap" />} />

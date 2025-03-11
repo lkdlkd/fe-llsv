@@ -1,43 +1,41 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import { fetchUserHistory } from "../../utils/api"; // Import hàm từ file API
+// import axios from "axios"; // Không cần thiết nữa nếu đã tách API
+import "../../App.css";
 
 const HistoryUser = () => {
-  // Lấy username từ localStorage
   const username = localStorage.getItem("username");
+  const token = localStorage.getItem("token");
   const [history, setHistory] = useState([]);
   const [loadingOrders, setLoadingOrders] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const limit = 10; // Số bản ghi trên mỗi trang
-  const token = localStorage.getItem('token'); // Hoặc cách lưu trữ khác
+  const limit = 10; // Số bản ghi mỗi trang
+  const [message, setMessage] = useState("");
 
-  // Hàm lấy dữ liệu phân trang
-  const fetchHistory = async (page) => {
+  // Hàm lấy dữ liệu lịch sử hoạt động
+  const loadHistory = async (page) => {
     setLoadingOrders(true);
     try {
-      const response = await axios.get(
-        `${process.env.REACT_APP_URL}/api/user/history/${username}?page=${page}&limit=${limit}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      }
-      );
-      // Giả sử API trả về object: { history, currentPage, totalPages, totalItems }
-      const { history: historyData, currentPage: cp, totalPages: tp } = response.data;
+      const data = await fetchUserHistory(token, username, page, limit);
+      const { history: historyData, currentPage: cp, totalPages: tp } = data;
       setHistory(historyData);
       setCurrentPage(cp);
       setTotalPages(tp);
     } catch (error) {
+      setMessage(error.message || "Có lỗi xảy ra, vui lòng thử lại!");
       console.error("Error fetching history:", error);
     } finally {
       setLoadingOrders(false);
     }
   };
 
-  // Gọi API khi component mount hoặc currentPage thay đổi
   useEffect(() => {
-    fetchHistory(currentPage);
-  }, [currentPage]);
+    if (username && token) {
+      loadHistory(currentPage);
+    }
+  }, [currentPage, username, token]);
+
 
   return (
     <div className="col-md-12">
@@ -102,7 +100,7 @@ const HistoryUser = () => {
                             </>
                           )}
                           ={" "}
-                          <span className="badge bg-success">
+                          <span className="badge badge-success">
                             {item.tienconlai}
                           </span>
                         </td>

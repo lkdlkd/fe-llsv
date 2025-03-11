@@ -65,10 +65,25 @@ select {
   padding: 8px;
   border-radius: 4px;
 }
+.badge-success{
+  color: #fff;
 
+  background-color: #28a745;
+
+}
+.badge-primary{
+  color: #fff;
+
+  background-color: #5671f0;
+
+}
+.badge-danger {
+  color: #fff;
+  background-color: #f35d5d;
+}
 .badge {
   display: inline-block;
-  background-color: #28a745;
+  /* background-color: #28a745; */
   color: #fff;
   padding: 2px 6px;
   border-radius: 4px;

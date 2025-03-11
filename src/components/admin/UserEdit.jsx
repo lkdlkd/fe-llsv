@@ -1,11 +1,11 @@
 import React, { useState } from "react";
-import axios from "axios";
 import { toast } from "react-toastify";
 import "../../style/UserEdit.css";  // Import file CSS
+import { updateUser } from "../../utils/apiAdmin"; // Import hàm updateUser
 
 const UserEdit = ({ user, onClose, onUserUpdated }) => {
   const [formData, setFormData] = useState(user);
-  const token = localStorage.getItem('token'); // Hoặc cách lưu trữ khác
+  const token = localStorage.getItem('token');
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -14,15 +14,7 @@ const UserEdit = ({ user, onClose, onUserUpdated }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.put(
-        `${process.env.REACT_APP_URL}/api/user/update/${user._id}`,
-        formData,
-        {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        }
-      );
+      await updateUser(user._id, formData, token);
       toast.success("Cập nhật thành công!");
       onUserUpdated();
       onClose();

@@ -1,116 +1,100 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import "../../App.css";
+import { fetchBanks, createBank, updateBank, deleteBank } from "../../utils/apiAdmin";
 
 function Banking() {
-    const [banks, setBanks] = useState([]);
-    const [formData, setFormData] = useState({
-        bank_name: '',
-        account_name: '',
-        account_number: '',
-        logo: '',
-        bank_account: '',
-        bank_password: '',
-        min_recharge: 0,
-        status: true,
-        token: ''
+  const [banks, setBanks] = useState([]);
+  const [formData, setFormData] = useState({
+    bank_name: '',
+    account_name: '',
+    account_number: '',
+    logo: '',
+    bank_account: '',
+    bank_password: '',
+    min_recharge: 0,
+    status: true,
+    token: ''
+  });
+  const [editing, setEditing] = useState(false);
+  const [editId, setEditId] = useState(null);
+  const token = localStorage.getItem('token');
+
+  // Lấy danh sách ngân hàng khi component load
+  useEffect(() => {
+    loadBanks();
+  }, []);
+
+  const loadBanks = async () => {
+    try {
+      const data = await fetchBanks(token);
+      setBanks(data);
+    } catch (error) {
+      console.error("Error fetching bank info:", error);
+    }
+  };
+
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData({ ...formData, [name]: type === "checkbox" ? checked : value });
+  };
+
+  const resetForm = () => {
+    setFormData({
+      bank_name: '',
+      account_name: '',
+      account_number: '',
+      logo: '',
+      bank_account: '',
+      bank_password: '',
+      min_recharge: 0,
+      status: true,
+      token: ''
     });
-    const [editing, setEditing] = useState(false);
-    const [editId, setEditId] = useState(null);
-    const token = localStorage.getItem('token'); // Hoặc cách lưu trữ khác
+  };
 
-    // Lấy danh sách ngân hàng khi component load
-    useEffect(() => {
-        fetchBanks();
-    }, []);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      if (editing) {
+        await updateBank(editId, formData, token);
+        console.log("Cập nhật ngân hàng thành công!");
+      } else {
+        await createBank(formData, token);
+        console.log("Thêm ngân hàng thành công!");
+      }
+      loadBanks();
+      setEditing(false);
+      setEditId(null);
+      resetForm();
+    } catch (error) {
+      console.error("Error submitting bank info:", error);
+    }
+  };
 
-    const fetchBanks = () => {
-        axios.get('http://localhost:5000/api/banks', {
-            headers: {
-              'Authorization': `Bearer ${token}`
-            }
-        })
-            .then(response => setBanks(response.data))
-            .catch(error => console.error("Error fetching bank info:", error));
-    };
+  const handleEdit = (bank) => {
+    setEditing(true);
+    setEditId(bank._id);
+    setFormData({
+      bank_name: bank.bank_name,
+      account_name: bank.account_name,
+      account_number: bank.account_number,
+      logo: bank.logo || '',
+      bank_account: bank.bank_account,
+      bank_password: bank.bank_password,
+      min_recharge: bank.min_recharge,
+      status: bank.status,
+      token: bank.token || ''
+    });
+  };
 
-    const handleChange = (e) => {
-        const { name, value, type, checked } = e.target;
-        setFormData({ ...formData, [name]: type === "checkbox" ? checked : value });
-    };
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        if (editing) {
-            // Cập nhật ngân hàng hiện có
-            axios.put(`http://localhost:5000/api/banks/${editId}`, formData, {
-                headers: {
-                  'Authorization': `Bearer ${token}`
-                }
-            })
-                .then(response => {
-                    fetchBanks();
-                    setEditing(false);
-                    setEditId(null);
-                    resetForm();
-                })
-                .catch(error => console.error("Error updating bank info:", error));
-        } else {
-            // Thêm ngân hàng mới
-            axios.post('http://localhost:5000/api/creatbank', formData, {
-                headers: {
-                  'Authorization': `Bearer ${token}`
-                }
-            })
-                .then(response => {
-                    fetchBanks();
-                    resetForm();
-                })
-                .catch(error => console.error("Error submitting bank info:", error));
-        }
-    };
-
-    const resetForm = () => {
-        setFormData({
-            bank_name: '',
-            account_name: '',
-            account_number: '',
-            logo: '',
-            bank_account: '',
-            bank_password: '',
-            min_recharge: 0,
-            status: true,
-            token: ''
-        });
-    };
-
-    const handleEdit = (bank) => {
-        setEditing(true);
-        setEditId(bank._id);
-        setFormData({
-            bank_name: bank.bank_name,
-            account_name: bank.account_name,
-            account_number: bank.account_number,
-            logo: bank.logo || '',
-            bank_account: bank.bank_account,
-            bank_password: bank.bank_password,
-            min_recharge: bank.min_recharge,
-            status: bank.status,
-            token: bank.token || ''
-        });
-    };
-
-    const handleDelete = (id) => {
-        axios.delete(`${process.env.REACT_APP_URL}/api/banks/${id}`, {
-            headers: {
-              'Authorization': `Bearer ${token}`
-            }
-        })
-            .then(response => {
-                fetchBanks();
-            })
-            .catch(error => console.error("Error deleting bank:", error));
-    };
+  const handleDelete = async (id) => {
+    try {
+      await deleteBank(id, token);
+      loadBanks();
+    } catch (error) {
+      console.error("Error deleting bank:", error);
+    }
+  };
 
     return (
         <div className="card">

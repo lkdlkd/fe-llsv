@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import "../../SmmForm.css"; // Import file CSS
+import { fetchSmmPartners, addSmmPartner, deleteSmmPartner } from "../../utils/apiAdmin";
 
 const SmmForm = () => {
   const [formData, setFormData] = useState({
@@ -11,23 +11,19 @@ const SmmForm = () => {
     status: "on",
     update_price: "on"
   });
-  const token = localStorage.getItem('token'); // Hoặc cách lưu trữ khác
+  const token = localStorage.getItem('token');
 
-  const [smmPartners, setSmmPartners] = useState([]); // Lưu danh sách đối tác
+  const [smmPartners, setSmmPartners] = useState([]);
 
   // Lấy danh sách đối tác từ API khi load trang
   useEffect(() => {
-    fetchSmmPartners();
+    loadSmmPartners();
   }, []);
 
-  const fetchSmmPartners = async () => {
+  const loadSmmPartners = async () => {
     try {
-      const response = await axios.get(`${process.env.REACT_APP_URL}/api/smm`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      setSmmPartners(response.data);
+      const data = await fetchSmmPartners(token);
+      setSmmPartners(data);
     } catch (error) {
       console.error("Lỗi khi tải danh sách đối tác:", error);
     }
@@ -40,17 +36,9 @@ const SmmForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post(
-        `${process.env.REACT_APP_URL}/api/smm/them`,
-        formData,
-        {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        }
-      );
+      await addSmmPartner(formData, token);
       alert("Đã thêm đối tác thành công!");
-      fetchSmmPartners(); // Cập nhật danh sách sau khi thêm
+      loadSmmPartners(); // Cập nhật danh sách sau khi thêm
       setFormData({
         name: "",
         url_api: "",
@@ -67,12 +55,8 @@ const SmmForm = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`${process.env.REACT_APP_URL}/api/smm/${id}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      fetchSmmPartners(); // Cập nhật danh sách sau khi xóa
+      await deleteSmmPartner(id, token);
+      loadSmmPartners(); // Cập nhật danh sách sau khi xóa
     } catch (error) {
       console.error("Lỗi khi xóa đối tác:", error);
     }

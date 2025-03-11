@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import Swal from "sweetalert2";
+
 import "../dichvu.css";
 
 const Danhsachdon = () => {
@@ -17,7 +19,7 @@ const Danhsachdon = () => {
   const limit = 10; // Số đơn hàng mỗi trang
 
   const username = localStorage.getItem("username");
-  const token = localStorage.getItem("token"); // Hoặc cách lưu trữ khác
+  const token = localStorage.getItem("token");
 
   // Lấy danh sách server từ API khi component load
   useEffect(() => {
@@ -26,9 +28,7 @@ const Danhsachdon = () => {
         const response = await axios.get(
           `${process.env.REACT_APP_URL}/api/server`,
           {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
+            headers: { Authorization: `Bearer ${token}` },
           }
         );
         setServers(response.data.data);
@@ -43,12 +43,12 @@ const Danhsachdon = () => {
   const uniqueTypes = Array.from(new Set(servers.map((server) => server.type)));
   const categoriesForType = selectedType
     ? Array.from(
-        new Set(
-          servers
-            .filter((server) => server.type === selectedType)
-            .map((server) => server.category)
-        )
+      new Set(
+        servers
+          .filter((server) => server.type === selectedType)
+          .map((server) => server.category)
       )
+    )
     : [];
 
   // Khi thay đổi type thì reset category
@@ -61,7 +61,7 @@ const Danhsachdon = () => {
     setSelectedCategory(e.target.value);
   };
 
-  // Hàm lấy đơn hàng: nếu selectedCategory rỗng thì không truyền điều kiện đó
+  // Hàm fetchOrders: Nếu có searchTerm hoặc selectedCategory thì dùng endpoint /api/order/screach, ngược lại dùng endpoint /api/order/orders
   const fetchOrders = async () => {
     if (!username) {
       setLoadingOrders(false);
@@ -69,32 +69,38 @@ const Danhsachdon = () => {
     }
     setLoadingOrders(true);
     try {
-      const response = await axios.get(
-        `${process.env.REACT_APP_URL}/api/order/screach`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          params: {
-            username,
-            ...(selectedCategory && { category: selectedCategory }),
-            page: currentPage,
-            limit,
-            search: searchTerm,
-          },
-        }
-      );
+      const isSearching = searchTerm.trim() !== "" || selectedCategory;
+      const endpoint = isSearching
+        ? `${process.env.REACT_APP_URL}/api/order/screach`
+        : `${process.env.REACT_APP_URL}/api/order/orders`;
+
+      const params = {
+        page: currentPage,
+        limit,
+        username,
+        ...(selectedCategory && { category: selectedCategory }),
+        ...(searchTerm.trim() !== "" && { search: searchTerm }),
+      };
+
+      const response = await axios.get(endpoint, {
+        headers: { Authorization: `Bearer ${token}` },
+        params,
+      });
+
       // Giả sử API trả về object { orders, currentPage, totalPages, totalOrders }
       setOrders(response.data.orders);
       setCurrentPage(response.data.currentPage);
       setTotalPages(response.data.totalPages);
       setMessage("");
     } catch (error) {
-      setMessage(
-        error.response
+ Swal.fire({
+        title: "Lỗi",
+        text: error.response
           ? error.response.data.message
-          : "Có lỗi xảy ra, vui lòng thử lại!"
-      );
+          : "Có lỗi xảy ra, vui lòng thử lại!",
+        icon: "error",
+        confirmButtonText: "Xác nhận",
+      });
     } finally {
       setLoadingOrders(false);
     }
@@ -107,148 +113,180 @@ const Danhsachdon = () => {
     fetchOrders();
   };
 
-  // Gọi lại fetchOrders mỗi khi thay đổi username, selectedCategory hoặc currentPage
+  // Load dữ liệu mặc định khi component mount và mỗi khi currentPage thay đổi
   useEffect(() => {
     fetchOrders();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [username, selectedCategory, currentPage]);
+  }, [username, currentPage]);
 
   return (
     <div className="col-md-12">
       <div className="card">
         <div className="card-header">
           <h2 className="card-title">Lịch sử tạo đơn</h2>
-          {/* Form tìm kiếm */}
-          <form onSubmit={handleSearch}>
-            <div className="input-group mb-3">
-              <input
-                type="text"
-                className="form-control"
-                placeholder="Tìm kiếm dữ liệu..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-              <button
-                type="submit"
-                className="btn btn-primary d-flex align-items-center"
-              >
-                <i className="fas fa-search"></i>
-              </button>
-            </div>
-          </form>
-          {/* Form chọn nền tảng và phân loại */}
-          <form>
-            <label>CHỌN NỀN TẢNG:</label>
-            <select value={selectedType} onChange={handleTypeChange}>
-              <option value="">Other</option>
-              {uniqueTypes.map((type, index) => (
-                <option key={index} value={type}>
-                  {type}
-                </option>
-              ))}
-            </select>
-            {selectedType && (
-              <>
-                <label>PHÂN LOẠI:</label>
-                <select
-                  value={selectedCategory}
-                  onChange={handleCategoryChange}
-                >
-                  <option value="">Other</option>
-                  {categoriesForType.map((category, index) => (
-                    <option key={index} value={category}>
-                      {category}
+        </div>
+        <div class="card-body">
+        <h5 className="card-title">nếu muốn xem đơn của loại nào thì chọn - ấn tìm (mặc định sẽ hiện tất cả)</h5>
+
+          <div className="row">
+            <div class="col-md-6 col-lg-3">
+              <div className="form-group">
+                <label>CHỌN NỀN TẢNG:</label>
+                <select class="form-select" value={selectedType} onChange={handleTypeChange}>
+                  <option value="">Chọn</option>
+                  {uniqueTypes.map((type, index) => (
+                    <option key={index} value={type}>
+                      {type}
                     </option>
                   ))}
                 </select>
-              </>
-            )}
-          </form>
-        </div>
-        <div className="card-body">
-          {message && <p>{message}</p>}
-          <div className="table-responsive">
-            {selectedCategory || searchTerm.trim() !== "" ? (
-              loadingOrders ? (
-                // Spinner / Loading indicator
-                <div className="spinner-container">
-                  <div className="spinner"></div>
-                  <p>Đang tải dữ liệu...</p>
-                </div>
-              ) : orders.length > 0 ? (
-                <div className="orders-table-container">
-                  <table className="table table-bordered table-hover table-striped fw-bold">
-                    <thead>
-                      <tr>
-                        <th>STT</th>
-                        <th>Mã đơn</th>
-                        <th>Username</th>
-                        <th>Link</th>
-                        <th>Server</th>
-                        <th>Số lượng</th>
-                        <th>Trạng thái</th>
-                        {selectedCategory === "BÌNH LUẬN" && (
-                          <th>Bình luận</th>
-                        )}
-                        <th>Ghi chú</th>
-                        <th>Ngày tạo</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {orders.map((order, index) => (
-                        <tr key={order.id}>
-                          <td>{index + 1}</td>
-                          <td>{order.Madon}</td>
-                          <td>{order.username}</td>
-                          <td>{order.link}</td>
-                          <td>{order.namesv}</td>
-                          <td>{order.quantity}</td>
-                          <td>{order.status}</td>
-                          {selectedCategory === "BÌNH LUẬN" && (
-                            <td>
-                              {order.category === "BÌNH LUẬN"
-                                ? order.comments || "Không có bình luận"
-                                : ""}
-                            </td>
-                          )}
-                          <td>{order.note}</td>
-                          <td>
-                            {new Date(order.createdAt).toLocaleString()}
-                          </td>
-                        </tr>
+              </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+              <div className="form-group">
+                {selectedType && (
+                  <>
+                    <label>PHÂN LOẠI:</label>
+                    <select
+                      className="form-select"
+                      value={selectedCategory}
+                      onChange={handleCategoryChange}
+                    >
+                      <option value="">Chọn</option>
+                      {categoriesForType.map((category, index) => (
+                        <option key={index} value={category}>
+                          {category}
+                        </option>
                       ))}
-                    </tbody>
-                  </table>
-                  {orders.length > 0 && (
-                    <div className="pagination-controls">
-                      <button
-                        onClick={() =>
-                          setCurrentPage((prev) => Math.max(prev - 1, 1))
-                        }
-                        disabled={currentPage === 1}
-                      >
-                        Previous
-                      </button>
-                      <span>
-                        {currentPage} / {totalPages}
-                      </span>
-                      <button
-                        onClick={() =>
-                          setCurrentPage((prev) =>
-                            Math.min(prev + 1, totalPages)
-                          )
-                        }
-                        disabled={currentPage === totalPages}
-                      >
-                        Next
-                      </button>
-                    </div>
-                  )}
+                    </select>
+                  </>
+                )}
+              </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+              <div class="form">
+                <label for="order_code" class="form-label">Mã đơn hàng hoặc link</label>
+                <div class="input-group">
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="Tìm kiếm dữ liệu..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+                  <button
+                    type="button"
+                    className="btn btn-primary d-flex align-items-center"
+                    onClick={handleSearch}
+                  >
+                    <i className="fas fa-search"></i>
+                  </button>
                 </div>
-              ) : (
-                <p>Không có đơn hàng nào.</p>
-              )
-            ) : null}
+              </div>
+
+            </div>
+          </div>
+
+          <div className="table-responsive">
+            {loadingOrders ? (
+              // Spinner / Loading indicator
+              <div className="spinner-container">
+                <div className="spinner"></div>
+                <p>Đang tải dữ liệu...</p>
+              </div>
+            ) : orders.length > 0 ? (
+              <div className="table-responsive">
+                <table className="table table-bordered table-hover table-striped fw-bold">
+                  <thead>
+                    <tr>
+                      <th>STT</th>
+                      <th>Mã đơn</th>
+                      <th>Username</th>
+                      <th>Link</th>
+                      <th>Server</th>
+                      <th>Bắt đầu</th>
+                      <th>đã chạy</th>
+                      <th>Số lượng mua</th>
+                      <th>Trạng thái</th>
+                      {selectedCategory === "BÌNH LUẬN" && (
+                        <th>Bình luận</th>
+                      )}
+                      <th>Ghi chú</th>
+                      <th>Ngày tạo</th>
+                    </tr>
+                  </thead>
+                  <tbody className="fw-bold">
+                    {orders.map((order, index) => (
+                      <tr key={order.id}>
+                        <td>{index + 1}</td>
+                        <td>{order.Madon}</td>
+                        <td>{order.username}</td>
+                        <td>{order.link}</td>
+                        <td>{order.namesv}</td>
+                        <td>{order.start}</td>
+                        <td>{order.dachay}</td>
+                        <td>{order.quantity}</td>
+                        <td>
+                          {order.status === "hoàn thành" ? (
+                            <span className="badge badge-badge badge-success">
+                              {order.status}
+                            </span>
+                          ) : order.status === "đang chạy" ? (
+                            <span className="badge badge-badge badge-primary">
+                              {order.status}
+                            </span>
+                          ) : order.status === "đã hủy" ? (
+                            <span className="badge badge-badge badge-danger">
+                              {order.status}
+                            </span>
+                          ) : (
+                            <span>{order.status}</span>
+                          )}
+                        </td>
+                        {selectedCategory === "BÌNH LUẬN" && (
+                          <td>
+                            {order.category === "BÌNH LUẬN"
+                              ? order.comments || "Không có bình luận"
+                              : ""}
+                          </td>
+                        )}
+                        <td>{order.note}</td>
+                        <td>
+                          {new Date(order.createdAt).toLocaleString()}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                {orders.length > 0 && (
+                  <div className="pagination-controls">
+                    <button
+                      onClick={() =>
+                        setCurrentPage((prev) => Math.max(prev - 1, 1))
+                      }
+                      disabled={currentPage === 1}
+                    >
+                      Previous
+                    </button>
+                    <span>
+                      {currentPage} / {totalPages}
+                    </span>
+                    <button
+                      onClick={() =>
+                        setCurrentPage((prev) =>
+                          Math.min(prev + 1, totalPages)
+                        )
+                      }
+                      disabled={currentPage === totalPages}
+                    >
+                      Next
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <p>Không có đơn hàng nào.</p>
+            )}
           </div>
         </div>
       </div>

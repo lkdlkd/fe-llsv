@@ -1,39 +1,27 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import axios from "axios";
+import { fetchUserData } from "../utils/api"; // Import API từ file api.js
 import "../App.css";
 
 function Home() {
   const [user, setUser] = useState({});
   const username = localStorage.getItem("username");
   const token = localStorage.getItem("token"); // Hoặc cách lưu trữ khác
-
   const [message, setMessage] = useState("");
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const response = await axios.get(
-          `${process.env.REACT_APP_URL}/api/user/${username}`,
-          {
-            headers: {
-              "Authorization": `Bearer ${token}`
-            },
-            params: { username }
-          }
-        );
-        setUser(response.data);
-      } catch (error) {
-        setMessage(
-          error.response
-            ? error.response.data.message
-            : "Có lỗi xảy ra, vui lòng thử lại!"
-        );
-        console.error("Lỗi khi lấy thông tin user", error);
-      }
-    };
-    fetchUser();
-  }, [username, token]);
+ 
+   useEffect(() => {
+     const getUser = async () => {
+       try {
+         const data = await fetchUserData(username, token);
+         setUser(data);
+       } catch (error) {
+         console.error("Lỗi khi lấy thông tin user", error);
+       }
+     };
+ 
+     if (username && token) {
+       getUser();
+     }
+   }, [username, token]);
 
   return (
     <div className="row">

@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import axios from 'axios';
+import { loginUser } from '../utils/api';
 import { useNavigate, Link } from 'react-router-dom';
 import { FaUser, FaLock } from 'react-icons/fa';
 import '../App.css';
@@ -18,39 +18,31 @@ export const Login = () => {
     e.preventDefault();
     setLoading(true);
     setAnimationClass('fade-out');
-
+  
     try {
-      const response = await axios.post(
-        `${process.env.REACT_APP_URL}/api/user/login`,
-        { username, password }
-      );
-      const { token, role } = response.data;
+      const { token, role } = await loginUser(username, password);
+      
       localStorage.setItem('token', token);
       localStorage.setItem('role', role);
       localStorage.setItem('username', username);
-
-      // Cập nhật thông tin đăng nhập trong context
+  
       updateAuth({ token, role, username });
-
+  
       setTimeout(() => {
         setLoading(false);
         if (role === 'admin') {
           navigate('/quantri');
-        } else if (role === 'user') {
+        } else {
           navigate('/home');
         }
       }, 800);
-    } catch (err) {
+    } catch (error) {
       setLoading(false);
       setAnimationClass('fade-in');
-      if (err.response) {
-        setError(err.response.data.message || 'Đăng nhập thất bại');
-      } else {
-        setError('Lỗi kết nối đến máy chủ');
-      }
+      setError(error.error);
     }
   };
-
+  
   return (
     <>
       {loading && (

@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
+import React, { useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import { FaUser, FaLock } from 'react-icons/fa';
 import '../style/Resgister.css'; // Import your CSS file
+import { registerUser } from '../utils/api'; // Import hàm đăng ký từ api.js
 
 const Register = () => {
   const navigate = useNavigate();
@@ -18,11 +18,10 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    // Start fade-out animation before navigating
     setAnimationClass("fade-out");
 
     try {
-      await axios.post(`${process.env.REACT_APP_URL}/api/user/register`, form);
+      await registerUser(form);
       setMessage("Đăng ký thành công!");
 
       // Wait for the fade-out animation to complete (0.8s)
@@ -32,9 +31,7 @@ const Register = () => {
     } catch (error) {
       setLoading(false);
       setAnimationClass("fade-in"); // Reset animation if there is an error
-      setMessage(
-        error.response?.data?.error 
-      );
+      setMessage(error.error);
     }
   };
 
@@ -59,7 +56,7 @@ const Register = () => {
               name="username"
               value={form.username}
               onChange={handleChange}
-              placeholder="tài khoản"
+              placeholder="Tài khoản"
             />
           </div>
           <div className="input-group">

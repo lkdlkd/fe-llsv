@@ -1,11 +1,11 @@
 import React, { useState } from "react";
-import axios from "axios";
 import { toast } from "react-toastify";
 import "../../style/AddBalanceForm.css";
+import { addUserBalance } from "../../utils/apiAdmin"; // Import hàm cộng tiền từ file API
 
 const AddBalanceForm = ({ user, onClose, onUserUpdated }) => {
   const [amount, setAmount] = useState("");
-  const token = localStorage.getItem('token');
+  const token = localStorage.getItem("token");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -15,15 +15,7 @@ const AddBalanceForm = ({ user, onClose, onUserUpdated }) => {
       return;
     }
     try {
-      await axios.put(
-        `${process.env.REACT_APP_URL}/api/user/add/${user._id}/balance`,
-        { amount: parsedAmount },
-        {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        }
-      );
+      await addUserBalance(user._id, parsedAmount, token);
       toast.success("Cộng tiền thành công!");
       onUserUpdated();
       onClose();

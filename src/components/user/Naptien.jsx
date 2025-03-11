@@ -1,50 +1,52 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import "../../App.css";
+import React, { useState, useEffect } from "react";
+import { fetchUserInfo, fetchBanks } from "../../utils/api"; // Import các hàm API
+// import "../../App.css"; // Import file CSS nếu cần
+import Swal from "sweetalert2";
 
 function Naptien() {
   const [banks, setBanks] = useState([]);
   const [user, setUser] = useState({});
   const username = localStorage.getItem("username");
   const [message, setMessage] = useState("");
+  const token = localStorage.getItem("token");
 
-  const token = localStorage.getItem('token'); // Hoặc cách lưu trữ khác
-
+  // Lấy thông tin người dùng khi component load
   useEffect(() => {
-    const fetchUser = async () => {
+    const loadUser = async () => {
       try {
-        const response = await axios.get(`${process.env.REACT_APP_URL}/api/user/${username}`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          },
-          params: { username },
-        });
-        setUser(response.data);
+        const userData = await fetchUserInfo(username, token);
+        setUser(userData);
       } catch (error) {
         setMessage(
-          error.response
-            ? error.response.data.message
-            : "Có lỗi xảy ra, vui lòng thử lại!"
+          error.message || "Có lỗi xảy ra, vui lòng thử lại!"
         );
         console.error("Lỗi khi lấy thông tin user", error);
       }
     };
-    fetchUser();
+    if (username && token) loadUser();
   }, [username, token]);
 
+  // Lấy danh sách ngân hàng khi component load
   useEffect(() => {
-    axios.get(`${process.env.REACT_APP_URL}/api/banks`, {
-      headers: {
-        'Authorization': `Bearer ${token}`
+    const loadBanks = async () => {
+      try {
+        const banksData = await fetchBanks(token);
+        setBanks(banksData);
+      } catch (error) {
+        console.error("Error fetching bank info:", error);
       }
-    })
-      .then(response => setBanks(response.data))
-      .catch(error => console.error("Error fetching bank info:", error));
+    };
+    if (token) loadBanks();
   }, [token]);
 
   const handleCopy = (text) => {
     navigator.clipboard.writeText(text)
-      .then(() => alert("Đã copy: " + text))
+      .then(() => Swal.fire({
+        title: "Thành công",
+        text: `copy thành công `,
+        icon: "success",
+        confirmButtonText: "Xác nhận",
+      }))
       .catch(err => console.error("Copy error:", err));
   };
 
@@ -121,8 +123,8 @@ function Naptien() {
                       <tr>
                         <td>Ngân Hàng</td>
                         <td>
-                          <p className="text-info fw-bolder ng-binding bank-name" 
-                             style={{ cursor: "pointer", color: "red", display: "inline-block" }}>
+                          <p className="text-info fw-bolder ng-binding bank-name"
+                            style={{ cursor: "pointer", color: "red", display: "inline-block" }}>
                             {bank.bank_name}
                           </p>
                         </td>
@@ -130,8 +132,8 @@ function Naptien() {
                       <tr>
                         <td>Tên chủ tài khoản</td>
                         <td>
-                          <p className="text-info fw-bolder ng-binding account-owner" 
-                             style={{ cursor: "pointer", color: "red", display: "inline-block" }}>
+                          <p className="text-info fw-bolder ng-binding account-owner"
+                            style={{ cursor: "pointer", color: "red", display: "inline-block" }}>
                             {bank.account_name}
                           </p>
                         </td>
@@ -139,8 +141,8 @@ function Naptien() {
                       <tr>
                         <td>Số tài khoản</td>
                         <td>
-                          <p className="text-info fw-bolder ng-binding account-number" 
-                             style={{ cursor: "pointer", color: "red", display: "inline-block" }}>
+                          <p className="text-info fw-bolder ng-binding account-number"
+                            style={{ cursor: "pointer", color: "red", display: "inline-block" }}>
                             {bank.account_number}
                           </p>
                           <button
@@ -155,8 +157,8 @@ function Naptien() {
                       <tr>
                         <td>Nội dung chuyển khoản</td>
                         <td>
-                          <p className="text-info fw-bolder ng-binding content-tranfer" 
-                             style={{ cursor: "pointer", color: "red", display: "inline-block" }}>
+                          <p className="text-info fw-bolder ng-binding content-tranfer"
+                            style={{ cursor: "pointer", color: "red", display: "inline-block" }}>
                             likesubviet {user.username}
                           </p>
                           <button
@@ -171,8 +173,8 @@ function Naptien() {
                       <tr>
                         <td>Nạp ít nhất</td>
                         <td>
-                          <p className="text-info fw-bolder ng-binding amount-money" 
-                             style={{ cursor: "pointer", color: "red", display: "inline-block" }}>
+                          <p className="text-info fw-bolder ng-binding amount-money"
+                            style={{ cursor: "pointer", color: "red", display: "inline-block" }}>
                             {bank.min_recharge}
                           </p>
                         </td>
