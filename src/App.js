@@ -19,19 +19,6 @@ import devtools from "devtools-detect";
 import { AuthContext, AuthProvider } from "./components/AuthContext";
 import Profile from "./components/user/Profile";
 
-document.addEventListener("contextmenu", (event) => event.preventDefault());
-document.addEventListener("keydown", (event) => {
-  if (event.key === "F12" || (event.ctrlKey && event.shiftKey && event.key === "I")) {
-    event.preventDefault();
-  }
-});
-
-(function () {
-  debugger;  // Khi DevTools mở, trình duyệt sẽ dừng lại ở đây
-  // Thêm các lệnh khác ở đây
-  // console.log("Hàm đã chạy");
-})();
-
 const getRole = () => {
   return localStorage.getItem("role") || "";
 };

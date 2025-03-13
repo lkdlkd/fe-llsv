@@ -274,18 +274,18 @@ const ServerFilterForm = () => {
                             }}
                           />
                           <label className="form-check-label" htmlFor={`server-${server.Magoi}`}>
-                            <span className="badge badge-success">{server.maychu}</span>
-                            <span>{server.name}</span>
+                            <span className="badge badge-success custom-control-label">{server.maychu}</span>
+                            <span className="custom-control-label">{server.name}</span>
                             <span className="badge badge-primary">
                               {Number(server.rate).toLocaleString("vi-VN")}đ
                             </span>
-                            <span className="badge badge-success">
+                            <span className="badge badge-success custom-control-label">
                               {server.trangthai ? "Hoạt động" : "Không hoạt động"}
                             </span>
                           </label>
                           {selectedMagoi === server.Magoi && (
                             <div
-                              className="server-description"
+                              className="server-description custom-control-label"
                               dangerouslySetInnerHTML={{ __html: server.description }}
                             />
                           )}

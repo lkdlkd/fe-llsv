@@ -40,12 +40,12 @@ const Alldon = () => {
   const uniqueTypes = Array.from(new Set(servers.map((server) => server.type)));
   const categoriesForType = selectedType
     ? Array.from(
-        new Set(
-          servers
-            .filter((server) => server.type === selectedType)
-            .map((server) => server.category)
-        )
+      new Set(
+        servers
+          .filter((server) => server.type === selectedType)
+          .map((server) => server.category)
       )
+    )
     : [];
 
   // Lọc danh sách server theo type và category đã chọn
@@ -176,7 +176,23 @@ const Alldon = () => {
                             <td>{order.link}</td>
                             <td>{order.namesv}</td>
                             <td>{order.quantity}</td>
-                            <td>{order.status}</td>
+                            <td>
+                              {order.status === "Completed" ? (
+                                <span className="badge badge-badge badge-success">
+                                  Hoàn thành
+                                </span>
+                              ) : order.status === "In progress" || order.status === "Processing" || order.status === "Pending" ? (
+                                <span className="badge badge-badge badge-primary">
+                                  Đang chạy
+                                </span>
+                              ) : order.status === "Canceled" ? (
+                                <span className="badge badge-badge badge-danger">
+                                  Đã hủy
+                                </span>
+                              ) : (
+                                <span>{order.status}</span>
+                              )}
+                            </td>
                             {selectedCategory === "BÌNH LUẬN" && (
                               <td>
                                 {order.category === "BÌNH LUẬN"

@@ -93,7 +93,7 @@ const Danhsachdon = () => {
       setTotalPages(response.data.totalPages);
       setMessage("");
     } catch (error) {
- Swal.fire({
+      Swal.fire({
         title: "Lỗi",
         text: error.response
           ? error.response.data.message
@@ -126,13 +126,13 @@ const Danhsachdon = () => {
           <h2 className="card-title">Lịch sử tạo đơn</h2>
         </div>
         <div class="card-body">
-        <h5 className="card-title">nếu muốn xem đơn của loại nào thì chọn - ấn tìm (mặc định sẽ hiện tất cả)</h5>
+          <h5 className="card-title">nếu muốn xem đơn của loại nào thì chọn - ấn tìm (mặc định sẽ hiện tất cả)</h5>
 
           <div className="row">
             <div class="col-md-6 col-lg-3">
               <div className="form-group">
                 <label>CHỌN NỀN TẢNG:</label>
-                <select class="form-select" value={selectedType} onChange={handleTypeChange}>
+                <select className="form-select" value={selectedType} onChange={handleTypeChange}>
                   <option value="">Chọn</option>
                   {uniqueTypes.map((type, index) => (
                     <option key={index} value={type}>
@@ -227,22 +227,24 @@ const Danhsachdon = () => {
                         <td>{order.dachay}</td>
                         <td>{order.quantity}</td>
                         <td>
-                          {order.status === "hoàn thành" ? (
+                          {order.status === "Completed" ? (
                             <span className="badge badge-badge badge-success">
-                              {order.status}
+                              Hoàn thành
                             </span>
-                          ) : order.status === "đang chạy" ? (
+                          ) : order.status === "In progress" || order.status === "Processing"|| order.status === "Pending" ? (
                             <span className="badge badge-badge badge-primary">
-                              {order.status}
+                              Đang chạy
                             </span>
-                          ) : order.status === "đã hủy" ? (
+                          ) : order.status === "Canceled" ? (
                             <span className="badge badge-badge badge-danger">
-                              {order.status}
+                              Đã hủy
                             </span>
                           ) : (
                             <span>{order.status}</span>
                           )}
                         </td>
+
+
                         {selectedCategory === "BÌNH LUẬN" && (
                           <td>
                             {order.category === "BÌNH LUẬN"
