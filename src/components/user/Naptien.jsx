@@ -159,7 +159,7 @@ function Naptien() {
                         <td>
                           <p className="text-info fw-bolder ng-binding content-tranfer"
                             style={{ cursor: "pointer", color: "red", display: "inline-block" }}>
-                            likesubviet {user.username}
+                            lsv {user.username}
                           </p>
                           <button
                             type="button"
@@ -258,8 +258,50 @@ function Naptien() {
           </div>
         </div>
       </div>
-
       {/* <div className="col-md-12">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="card-title">Lịch sử nạp thẻ cào</h5>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-striped table-bordered table-hover">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+
+                    <th>Loại thẻ</th>
+                    <th>Mệnh giá</th>
+                    <th>Seri</th>
+                    <th>Mã thẻ</th>
+                    <th>Thực nhận</th>
+                    <th>Trạng thái</th>
+                    <th>Thời gian gửi</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td colspan="12" class="text-center">
+                      <div class="d-flex justify-content-center align-items-center">
+                        <div class="text-center">
+                          <img src="" alt="Không tìm thấy dữ liệu" class="img-fluid" style={{ maxwidth: "100px" }} />
+                          <h4 class="text-muted">Không tìm thấy dữ liệu</h4>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+
+                </tbody>
+              </table>
+              <div class="d-flex justify-content-center align-items-center">
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div> */}
+
+      <div className="col-md-12">
         <div className="card">
           <div className="card-header">
             <h5 className="card-title">Lịch sử nạp tiền ngân hàng</h5>
@@ -281,7 +323,16 @@ function Naptien() {
                   </tr>
                 </thead>
                 <tbody>
-                  <tr>
+                <tr>
+                    <td colspan="12" class="text-center">
+                      <div class="d-flex justify-content-center align-items-center">
+                        <div class="text-center">
+                          <h4 class="text-muted">Không tìm thấy dữ liệu</h4>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                  {/* <tr>
                     <td>1</td>
                     <td>
                       <span className="badge bg-success"></span>
@@ -302,15 +353,15 @@ function Naptien() {
                         lê khánh đăng chuyển tiền nd : likesubviet user
                       </textarea>
                     </td>
-                  </tr>
+                  </tr> */}
                 </tbody>
               </table>
             </div>
           </div>
         </div>
-      </div> */}
+      </div>
 
-      {/* <div className="col-md-12">
+      <div className="col-md-12">
         <div className="card">
           <div className="card-header">
             <h5 className="card-title">Lịch sử nạp thẻ cào</h5>
@@ -331,7 +382,16 @@ function Naptien() {
                   </tr>
                 </thead>
                 <tbody>
-                  <tr>
+                <tr>
+                    <td colspan="12" class="text-center">
+                      <div class="d-flex justify-content-center align-items-center">
+                        <div class="text-center">
+                          <h4 class="text-muted">Không tìm thấy dữ liệu</h4>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                  {/* <tr>
                     <td></td>
                     <td></td>
                     <td></td>
@@ -344,14 +404,14 @@ function Naptien() {
                       <span className="badge bg-success">Thành công</span>
                       <span className="badge bg-danger">Thất bại</span>
                     </td>
-                  </tr>
+                  </tr> */}
                 </tbody>
               </table>
               <div className="d-flex justify-content-center align-items-center"></div>
             </div>
           </div>
         </div>
-      </div> */}
+      </div>
     </div>
   );
 }

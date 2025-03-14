@@ -26,7 +26,7 @@ function AdminMenu() {
         <nav className="pc-sidebar">
         <div className="navbar-wrapper">
           <div className="m-header">
-            <a href="" className="b-brand text-primary">
+            <a href="/home" className="b-brand text-primary">
               {/* ========   Change your logo from here   ============ */}
               <span>LIKESUBVIET</span>
             </a>

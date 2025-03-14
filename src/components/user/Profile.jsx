@@ -21,21 +21,21 @@ function Profile() {
             }))
             .catch(err => console.error("Copy error:", err));
     };
-     useEffect(() => {
-         const getUser = async () => {
-           try {
-             const data = await fetchUserData(username, token);
-             setUser(data);
-           } catch (error) {
-             console.error("Lỗi khi lấy thông tin user", error);
-           }
-         };
-     
-         if (username && token) {
-           getUser();
-         }
-       }, [username, token]);
-    
+    useEffect(() => {
+        const getUser = async () => {
+            try {
+                const data = await fetchUserData(username, token);
+                setUser(data);
+            } catch (error) {
+                console.error("Lỗi khi lấy thông tin user", error);
+            }
+        };
+
+        if (username && token) {
+            getUser();
+        }
+    }, [username, token]);
+
 
     return (
         <div className="row">
@@ -60,11 +60,7 @@ function Profile() {
                                                                 <input type="text" class="form-control" id="username" disabled
                                                                     value={user.username} />
                                                             </div>
-                                                            <div class="col-md-6 form-group">
-                                                                <label for="created_at" class="form-label">Thời gian đăng kí:</label>
-                                                                <input type="text" class="form-control" id="created_at" disabled
-                                                                    value={user.createdAt} />
-                                                            </div>
+
                                                             <div class="col-md-6 form-group">
                                                                 <label for="balance" class="form-label">Số dư:</label>
                                                                 <input type="text" class="form-control" id="balance" disabled
@@ -80,6 +76,26 @@ function Profile() {
                                                                 <input type="text" class="form-control" id="balance" disabled
                                                                     value={user.tongnap} />
                                                             </div>
+                                                            <div className="col-md-6 form-group">
+                                                                <label htmlFor="created_at" className="form-label">
+                                                                    Thời gian đăng kí:
+                                                                </label>
+                                                                <input
+                                                                    type="text"
+                                                                    className="form-control"
+                                                                    id="created_at"
+                                                                    disabled
+                                                                    value={new Date(user.createdAt).toLocaleString("vi-VN", {
+                                                                        day: "2-digit",
+                                                                        month: "2-digit",
+                                                                        year: "numeric",
+                                                                        hour: "2-digit",
+                                                                        minute: "2-digit",
+                                                                        second: "2-digit",
+                                                                    })}
+                                                                />
+                                                            </div>
+
                                                             <div class="col-md-12 form-group">
                                                                 <label for="api_token" class="form-label">Api Token</label>
                                                                 <div className="input-group">

@@ -59,7 +59,7 @@ function Header({ user }) {
             {/* User Block */}
             <li className="dropdown pc-h-item header-user-profile">
               <span className="pc-mtext">
-                <label>Số dư: </label>
+                <label>Số dư :  </label>
                 {user ? user.balance : "Đang tải..."}
               </span>
               <a

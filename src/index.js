@@ -4,18 +4,18 @@ import './index.css';
 import App from './App';
 
 
-document.addEventListener("contextmenu", (event) => event.preventDefault());
-document.addEventListener("keydown", (event) => {
-  if (event.key === "F12" || (event.ctrlKey && event.shiftKey && event.key === "I")) {
-    event.preventDefault();
-  }
-});
+// document.addEventListener("contextmenu", (event) => event.preventDefault());
+// document.addEventListener("keydown", (event) => {
+//   if (event.key === "F12" || (event.ctrlKey && event.shiftKey && event.key === "I")) {
+//     event.preventDefault();
+//   }
+// });
 
-(function () {
-  debugger;  // Khi DevTools mở, trình duyệt sẽ dừng lại ở đây
-  // Thêm các lệnh khác ở đây
-  // console.log("Hàm đã chạy");
-})();
+// (function () {
+//   debugger;  // Khi DevTools mở, trình duyệt sẽ dừng lại ở đây
+//   // Thêm các lệnh khác ở đây
+//   // console.log("Hàm đã chạy");
+// })();
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

@@ -31,7 +31,7 @@ function MenuUser() {
     <nav className="pc-sidebar">
       <div className="navbar-wrapper">
         <div className="m-header">
-          <a href="/" className="b-brand text-primary">
+          <a href="/home" className="b-brand text-primary">
             <span>WEB CHÍNH SUBVIET.VN</span>
           </a>
         </div>
@@ -57,7 +57,7 @@ function MenuUser() {
             <li className="pc-item pc-caption">
               <label>Bảng Điều Khiển</label>
             </li>
-            <li className="pc-item pc-hasmenu">
+            {/* <li className="pc-item pc-hasmenu">
               <a onClick={() => toggleMenu("Menu")} className="pc-link">
                 <span className="pc-micon">
                   <img src="/dashboard.png" className="wid-35" alt="" />
@@ -77,34 +77,34 @@ function MenuUser() {
                       <span className="pc-mtext">Trang Chủ</span>
                     </a>
                   </li>
-                  <li className="pc-item">
-                    <a href="/profile" className="pc-link">
-                      <span className="pc-micon">
-                        <img src="/home.png" className="wid-35" alt="" />
-                      </span>
-                      <span className="pc-mtext">Thông tin cá nhân</span>
-                    </a>
-                  </li>
-                  <li className="pc-item">
-                    <a href="/nap-tien" className="pc-link">
-                      <span className="pc-micon">
-                        <img src="/payment-method.png" className="wid-35" alt="" />
-                      </span>
-                      <span className="pc-mtext">Nạp Tiền</span>
-                    </a>
-                  </li>
-                  <li className="pc-item">
-                    <a href="/lich-su-hoat-dong" className="pc-link">
-                      <span className="pc-micon">
-                        <img src="/transactions.png" className="wid-35" alt="" />
-                      </span>
-                      <span className="pc-mtext">Lịch Sử Hoạt Động</span>
-                    </a>
-                  </li>
+
                 </ul>
               )}
+            </li> */}
+            <li className="pc-item">
+              <a href="/profile" className="pc-link">
+                <span className="pc-micon">
+                  <img src="/home.png" className="wid-35" alt="" />
+                </span>
+                <span className="pc-mtext">Thông Tin Cá Nhân</span>
+              </a>
             </li>
-            
+            <li className="pc-item">
+              <a href="/nap-tien" className="pc-link">
+                <span className="pc-micon">
+                  <img src="/payment-method.png" className="wid-35" alt="" />
+                </span>
+                <span className="pc-mtext">Nạp Tiền</span>
+              </a>
+            </li>
+            <li className="pc-item">
+              <a href="/lich-su-hoat-dong" className="pc-link">
+                <span className="pc-micon">
+                  <img src="/transactions.png" className="wid-35" alt="" />
+                </span>
+                <span className="pc-mtext">Lịch Sử Hoạt Động</span>
+              </a>
+            </li>
             <li className="pc-item pc-caption">
               <label>Danh Sách Dịch Vụ</label>
             </li>

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import Swal from "sweetalert2";
-import "../style/muahang.scss";
 import "../dichvu.css";
 import { fetchServers, getUID, addOrder } from "../utils/api";
 
@@ -27,7 +26,7 @@ const ServerFilterForm = () => {
 
   const username = localStorage.getItem("username");
   const token = localStorage.getItem("token");
-
+  // console.log("sv ", servers)
   // Lấy danh sách server từ API khi component load
   useEffect(() => {
     const loadServers = async () => {
@@ -45,12 +44,12 @@ const ServerFilterForm = () => {
   const uniqueTypes = Array.from(new Set(servers.map((server) => server.type)));
   const categoriesForType = selectedType
     ? Array.from(
-        new Set(
-          servers
-            .filter((server) => server.type === selectedType)
-            .map((server) => server.category)
-        )
+      new Set(
+        servers
+          .filter((server) => server.type === selectedType)
+          .map((server) => server.category)
       )
+    )
     : [];
 
   // Lọc danh sách server theo type và category đã chọn
@@ -209,12 +208,14 @@ const ServerFilterForm = () => {
               </h3>
               <div className="form-group mb-3">
                 <label>CHỌN NỀN TẢNG:</label>
-                <select className="form-select"
+                <select
+                  className="form-select"
                   value={selectedType}
-                  onChange={handleTypeChange}>
-                  <option value="">Other</option>
+                  onChange={handleTypeChange}
+                >
+                  <option value="" className="text-secondary">Chọn</option>
                   {uniqueTypes.map((type, index) => (
-                    <option key={index} value={type}>
+                    <option key={index} value={type} className="text-primary">
                       {type}
                     </option>
                   ))}
@@ -222,12 +223,14 @@ const ServerFilterForm = () => {
                 {selectedType && (
                   <>
                     <label>PHÂN LOẠI:</label>
-                    <select className="form-select"
-                      value={selectedCategory} 
-                      onChange={handleCategoryChange}>
-                      <option value="">Other</option>
+                    <select
+                      className="form-select"
+                      value={selectedCategory}
+                      onChange={handleCategoryChange}
+                    >
+                      <option value="" className="text-secondary">Chọn</option>
                       {categoriesForType.map((category, index) => (
-                        <option key={index} value={category}>
+                        <option key={index} value={category} className="text-primary">
                           {category}
                         </option>
                       ))}
@@ -235,6 +238,7 @@ const ServerFilterForm = () => {
                   </>
                 )}
               </div>
+
               <form onSubmit={handleSubmit}>
                 {selectedType && selectedCategory && (
                   <>
@@ -283,14 +287,22 @@ const ServerFilterForm = () => {
                               {server.trangthai ? "Hoạt động" : "Không hoạt động"}
                             </span>
                           </label>
+
+                        </div>
+                      ))}
+                      {servers.map((server) => (
+                        <div key={server.id}>
                           {selectedMagoi === server.Magoi && (
                             <div
-                              className="server-description custom-control-label"
+                              className="alert bg-warning text-white"
                               dangerouslySetInnerHTML={{ __html: server.description }}
                             />
                           )}
                         </div>
                       ))}
+
+
+
                     </div>
                     {(() => {
                       const selectedService = filteredServers.find(

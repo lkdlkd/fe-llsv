@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
-
 import "../dichvu.css";
 
 const Danhsachdon = () => {
@@ -9,14 +8,12 @@ const Danhsachdon = () => {
   const [selectedType, setSelectedType] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
-
   const [message, setMessage] = useState("");
   const [orders, setOrders] = useState([]);
   const [loadingOrders, setLoadingOrders] = useState(true);
-
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const limit = 10; // Số đơn hàng mỗi trang
+  const [limit, setLimit] = useState(10); // Số đơn hàng mỗi trang, mặc định là 10
 
   const username = localStorage.getItem("username");
   const token = localStorage.getItem("token");
@@ -43,12 +40,12 @@ const Danhsachdon = () => {
   const uniqueTypes = Array.from(new Set(servers.map((server) => server.type)));
   const categoriesForType = selectedType
     ? Array.from(
-      new Set(
-        servers
-          .filter((server) => server.type === selectedType)
-          .map((server) => server.category)
+        new Set(
+          servers
+            .filter((server) => server.type === selectedType)
+            .map((server) => server.category)
+        )
       )
-    )
     : [];
 
   // Khi thay đổi type thì reset category
@@ -113,181 +110,214 @@ const Danhsachdon = () => {
     fetchOrders();
   };
 
-  // Load dữ liệu mặc định khi component mount và mỗi khi currentPage thay đổi
+  // Load dữ liệu mặc định khi component mount và mỗi khi currentPage hoặc limit thay đổi
   useEffect(() => {
     fetchOrders();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [username, currentPage]);
+  }, [username, currentPage, limit]);
+
+  // Xử lý thay đổi số đơn hàng hiển thị mỗi trang
+  const handleLimitChange = (e) => {
+    setLimit(Number(e.target.value));
+    setCurrentPage(1);
+  };
 
   return (
-    <div className="col-md-12">
-      <div className="card">
-        <div className="card-header">
-          <h2 className="card-title">Lịch sử tạo đơn</h2>
-        </div>
-        <div class="card-body">
-          <h5 className="card-title">nếu muốn xem đơn của loại nào thì chọn - ấn tìm (mặc định sẽ hiện tất cả)</h5>
+    <div className="row">
+      <div className="col-md-12">
+        <div className="card">
+          <div className="card-header">
+            <h2 className="card-title">Lịch sử tạo đơn</h2>
+          </div>
+          <div className="card-body">
+            <h5 className="card-title">
+              Nếu muốn xem đơn của loại nào thì chọn - ấn tìm (mặc định sẽ hiện tất cả)
+            </h5>
 
-          <div className="row">
-            <div class="col-md-6 col-lg-3">
-              <div className="form-group">
-                <label>CHỌN NỀN TẢNG:</label>
-                <select className="form-select" value={selectedType} onChange={handleTypeChange}>
-                  <option value="">Chọn</option>
-                  {uniqueTypes.map((type, index) => (
-                    <option key={index} value={type}>
-                      {type}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-            <div class="col-md-6 col-lg-3">
-              <div className="form-group">
-                {selectedType && (
-                  <>
-                    <label>PHÂN LOẠI:</label>
-                    <select
-                      className="form-select"
-                      value={selectedCategory}
-                      onChange={handleCategoryChange}
-                    >
-                      <option value="">Chọn</option>
-                      {categoriesForType.map((category, index) => (
-                        <option key={index} value={category}>
-                          {category}
-                        </option>
-                      ))}
-                    </select>
-                  </>
-                )}
-              </div>
-            </div>
-            <div class="col-md-6 col-lg-3">
-              <div class="form">
-                <label for="order_code" class="form-label">Mã đơn hàng hoặc link</label>
-                <div class="input-group">
-                  <input
-                    type="text"
-                    className="form-control"
-                    placeholder="Tìm kiếm dữ liệu..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                  />
-                  <button
-                    type="button"
-                    className="btn btn-primary d-flex align-items-center"
-                    onClick={handleSearch}
+            <div className="row">
+              <div className="col-md-6 col-lg-3">
+                <div className="form-group">
+                  <label>CHỌN NỀN TẢNG:</label>
+                  <select
+                    className="form-select"
+                    value={selectedType}
+                    onChange={handleTypeChange}
                   >
-                    <i className="fas fa-search"></i>
-                  </button>
+                    <option value="">Chọn</option>
+                    {uniqueTypes.map((type, index) => (
+                      <option key={index} value={type}>
+                        {type}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
-
-            </div>
-          </div>
-
-          <div className="table-responsive">
-            {loadingOrders ? (
-              // Spinner / Loading indicator
-              <div className="spinner-container">
-                <div className="spinner"></div>
-                <p>Đang tải dữ liệu...</p>
+              <div className="col-md-6 col-lg-3">
+                <div className="form-group">
+                  {selectedType && (
+                    <>
+                      <label>PHÂN LOẠI:</label>
+                      <select
+                        className="form-select"
+                        value={selectedCategory}
+                        onChange={handleCategoryChange}
+                      >
+                        <option value="">Chọn</option>
+                        {categoriesForType.map((category, index) => (
+                          <option key={index} value={category}>
+                            {category}
+                          </option>
+                        ))}
+                      </select>
+                    </>
+                  )}
+                </div>
               </div>
-            ) : orders.length > 0 ? (
-              <div className="table-responsive">
-                <table className="table table-bordered table-hover table-striped fw-bold">
-                  <thead>
-                    <tr>
-                      <th>STT</th>
-                      <th>Mã đơn</th>
-                      <th>Username</th>
-                      <th>Link</th>
-                      <th>Server</th>
-                      <th>Bắt đầu</th>
-                      <th>đã chạy</th>
-                      <th>Số lượng mua</th>
-                      <th>Trạng thái</th>
-                      {selectedCategory === "BÌNH LUẬN" && (
-                        <th>Bình luận</th>
-                      )}
-                      <th>Ghi chú</th>
-                      <th>Ngày tạo</th>
-                    </tr>
-                  </thead>
-                  <tbody className="fw-bold">
-                    {orders.map((order, index) => (
-                      <tr key={order.id}>
-                        <td>{index + 1}</td>
-                        <td>{order.Madon}</td>
-                        <td>{order.username}</td>
-                        <td>{order.link}</td>
-                        <td>{order.namesv}</td>
-                        <td>{order.start}</td>
-                        <td>{order.dachay}</td>
-                        <td>{order.quantity}</td>
-                        <td>
-                          {order.status === "Completed" ? (
-                            <span className="badge badge-badge badge-success">
-                              Hoàn thành
-                            </span>
-                          ) : order.status === "In progress" || order.status === "Processing"|| order.status === "Pending" ? (
-                            <span className="badge badge-badge badge-primary">
-                              Đang chạy
-                            </span>
-                          ) : order.status === "Canceled" ? (
-                            <span className="badge badge-badge badge-danger">
-                              Đã hủy
-                            </span>
-                          ) : (
-                            <span>{order.status}</span>
-                          )}
-                        </td>
-
-
-                        {selectedCategory === "BÌNH LUẬN" && (
-                          <td>
-                            {order.category === "BÌNH LUẬN"
-                              ? order.comments || "Không có bình luận"
-                              : ""}
-                          </td>
-                        )}
-                        <td>{order.note}</td>
-                        <td>
-                          {new Date(order.createdAt).toLocaleString()}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-                {orders.length > 0 && (
-                  <div className="pagination-controls">
+              <div className="col-md-6 col-lg-3">
+                <div className="form">
+                  <label htmlFor="order_code" className="form-label">
+                    Mã đơn hàng hoặc link
+                  </label>
+                  <div className="input-group">
+                    <input
+                      type="text"
+                      className="form-control"
+                      placeholder="Tìm kiếm dữ liệu..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                    />
                     <button
-                      onClick={() =>
-                        setCurrentPage((prev) => Math.max(prev - 1, 1))
-                      }
-                      disabled={currentPage === 1}
+                      type="button"
+                      className="btn btn-primary d-flex align-items-center"
+                      onClick={handleSearch}
                     >
-                      Previous
-                    </button>
-                    <span>
-                      {currentPage} / {totalPages}
-                    </span>
-                    <button
-                      onClick={() =>
-                        setCurrentPage((prev) =>
-                          Math.min(prev + 1, totalPages)
-                        )
-                      }
-                      disabled={currentPage === totalPages}
-                    >
-                      Next
+                      <i className="fas fa-search"></i>
                     </button>
                   </div>
-                )}
+                </div>
               </div>
-            ) : (
-              <p>Không có đơn hàng nào.</p>
+              <div className="col-md-6 col-lg-3">
+                <div className="form-group">
+                  <label>Số đơn hàng/trang:</label>
+                  <select
+                    className="form-select"
+                    value={limit}
+                    onChange={handleLimitChange}
+                  >
+                    <option value={10}>10</option>
+                    <option value={25}>25</option>
+                    <option value={50}>50</option>
+                    <option value={100}>100</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div className="table-responsive">
+              {loadingOrders ? (
+                // Spinner / Loading indicator
+                <div className="spinner-container">
+                  <div className="spinner"></div>
+                  <p>Đang tải dữ liệu...</p>
+                </div>
+              ) : orders.length > 0 ? (
+                <div className="table-responsive">
+                  <table className="table table-bordered table-hover table-striped fw-bold">
+                    <thead>
+                      <tr>
+                        <th>STT</th>
+                        <th>Mã đơn</th>
+                        <th>Username</th>
+                        <th>Link</th>
+                        <th>Server</th>
+                        <th>Bắt đầu</th>
+                        <th>Đã chạy</th>
+                        <th>Số lượng mua</th>
+                        <th>Trạng thái</th>
+                        {selectedCategory === "BÌNH LUẬN" && <th>Bình luận</th>}
+                        <th>Ghi chú</th>
+                        <th>Ngày tạo</th>
+                      </tr>
+                    </thead>
+                    <tbody className="fw-bold">
+                      {orders.map((order, index) => (
+                        <tr key={order.id}>
+                          <td>{index + 1}</td>
+                          <td>{order.Madon}</td>
+                          <td>{order.username}</td>
+                          <td>{order.link}</td>
+                          <td>{order.namesv}</td>
+                          <td>{order.start}</td>
+                          <td>{order.dachay}</td>
+                          <td>{order.quantity}</td>
+                          <td>
+                            {order.status === "Completed" ? (
+                              <span className="badge badge-badge badge-success">
+                                Hoàn thành
+                              </span>
+                            ) : order.status === "In progress" ||
+                              order.status === "Processing" ||
+                              order.status === "Pending" ? (
+                              <span className="badge badge-badge bg-primary">
+                                Đang chạy
+                              </span>
+                            ) : order.status === "Canceled" ? (
+                              <span className="badge badge-badge badge-danger">
+                                Đã hủy
+                              </span>
+                            ) : (
+                              <span>{order.status}</span>
+                            )}
+                          </td>
+                          {selectedCategory === "BÌNH LUẬN" && (
+                            <td>
+                              {order.category === "BÌNH LUẬN"
+                                ? order.comments || "Không có bình luận"
+                                : ""}
+                            </td>
+                          )}
+                          <td>{order.note}</td>
+                          <td>{new Date(order.createdAt).toLocaleString("vi-VN", {
+                            day: "2-digit",
+                            month: "2-digit",
+                            year: "numeric",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                            second: "2-digit",
+                          })}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <p>Không có đơn hàng nào.</p>
+              )}
+            </div>
+            {orders.length > 0 && (
+              <div className="pagination-controls">
+                <button
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.max(prev - 1, 1))
+                  }
+                  disabled={currentPage === 1}
+                >
+                  Previous
+                </button>
+                <span>
+                  {currentPage} / {totalPages}
+                </span>
+                <button
+                  onClick={() =>
+                    setCurrentPage((prev) =>
+                      Math.min(prev + 1, totalPages)
+                    )
+                  }
+                  disabled={currentPage === totalPages}
+                >
+                  Next
+                </button>
+              </div>
             )}
           </div>
         </div>
