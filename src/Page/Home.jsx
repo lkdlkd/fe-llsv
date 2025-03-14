@@ -32,7 +32,7 @@ function Home() {
 
 
   useEffect(() => {
-    const time = 60 * 1000; // 1 phút
+    const time = 60 * 60 *1000; // 1 phút
     const savedTime = Number(localStorage.getItem("isNoticeModal"));
     const modalElement = document.getElementById("notiModal");
 
