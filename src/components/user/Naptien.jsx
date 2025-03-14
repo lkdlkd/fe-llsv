@@ -173,11 +173,14 @@ function Naptien() {
                       <tr>
                         <td>Nạp ít nhất</td>
                         <td>
-                          <p className="text-info fw-bolder ng-binding amount-money"
-                            style={{ cursor: "pointer", color: "red", display: "inline-block" }}>
-                            {bank.min_recharge}
+                          <p
+                            className="text-info fw-bolder ng-binding amount-money"
+                            style={{ cursor: "pointer", color: "red", display: "inline-block" }}
+                          >
+                            {bank?.min_recharge ? Number(bank.min_recharge).toLocaleString("vi-VN") : "0"}đ
                           </p>
                         </td>
+
                       </tr>
                     </tbody>
                   </table>
@@ -323,7 +326,7 @@ function Naptien() {
                   </tr>
                 </thead>
                 <tbody>
-                <tr>
+                  <tr>
                     <td colspan="12" class="text-center">
                       <div class="d-flex justify-content-center align-items-center">
                         <div class="text-center">
@@ -382,7 +385,7 @@ function Naptien() {
                   </tr>
                 </thead>
                 <tbody>
-                <tr>
+                  <tr>
                     <td colspan="12" class="text-center">
                       <div class="d-flex justify-content-center align-items-center">
                         <div class="text-center">

@@ -41,12 +41,12 @@ function Header({ user }) {
                 aria-expanded="false"
               >
                 <svg className="pc-icon">
-                <i className="ti ti-menu-2"></i>
+                  <i className="ti ti-menu-2"></i>
                 </svg>
               </a>
               <div className="dropdown-menu  drp-search">
                 <form className="px-3 py-2">
-                <i className="ti ti-menu-2"></i>
+                  <i className="ti ti-menu-2"></i>
 
                 </form>
               </div>
@@ -60,7 +60,7 @@ function Header({ user }) {
             <li className="dropdown pc-h-item header-user-profile">
               <span className="pc-mtext">
                 <label>Số dư :</label>
-                 {user ? user.balance : "Đang tải..."} đ
+                {user ? Number(user.balance).toLocaleString("vi-VN") : "Đang tải..."} đ
               </span>
               <a
                 className="pc-head-link dropdown-toggle arrow-none me-0"

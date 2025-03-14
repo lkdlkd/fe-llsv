@@ -58,13 +58,13 @@ function Profile() {
                                                             <div class="col-md-6 form-group">
                                                                 <label for="username" class="form-label">Tài khoản:</label>
                                                                 <input type="text" class="form-control" id="username" disabled
-                                                                    value={user.username} />
+                                                                    value={user.username } />
                                                             </div>
 
                                                             <div class="col-md-6 form-group">
                                                                 <label for="balance" class="form-label">Số dư:</label>
                                                                 <input type="text" class="form-control" id="balance" disabled
-                                                                    value={user.balance} />
+                                                                    value={user ? Number(user.balance|| 0).toLocaleString("vi-VN") : "Đang tải..."} />
                                                             </div>
                                                             <div class="col-md-6 form-group">
                                                                 <label for="balance" class="form-label">Cấp bậc</label>
@@ -72,10 +72,17 @@ function Profile() {
                                                                     value={user.capbac} />
                                                             </div>
                                                             <div class="col-md-6 form-group">
+                                                                <label for="balance" class="form-label">Tổng nạp tháng</label>
+                                                                <input type="text" class="form-control" id="balance" disabled
+                                                                    value={Number(user.tongnapthang || 0).toLocaleString("vi-VN")}/>
+                                                            </div>
+
+                                                            <div class="col-md-6 form-group">
                                                                 <label for="balance" class="form-label">Tổng nạp</label>
                                                                 <input type="text" class="form-control" id="balance" disabled
-                                                                    value={user.tongnap} />
+                                                                    value={Number(user.tongnap || 0).toLocaleString("vi-VN")} />
                                                             </div>
+
                                                             <div className="col-md-6 form-group">
                                                                 <label htmlFor="created_at" className="form-label">
                                                                     Thời gian đăng kí:

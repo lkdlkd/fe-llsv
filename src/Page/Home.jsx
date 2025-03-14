@@ -101,7 +101,7 @@ function Home() {
                 </div>
                 <div className="flex-grow-1 ms-3">
                   <h4 className="mb-0">
-                    {user ? user.tongnapthang : "Đang tải..."}
+                  {Number(user.tongnapthang || 0).toLocaleString("vi-VN")}đ
                   </h4>
                   <h6 className="mb-0">
                     Tổng nạp tháng {new Date().getMonth() + 1}
