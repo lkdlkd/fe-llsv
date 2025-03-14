@@ -59,8 +59,8 @@ function Header({ user }) {
             {/* User Block */}
             <li className="dropdown pc-h-item header-user-profile">
               <span className="pc-mtext">
-                <label>Số dư :  </label>
-                {user ? user.balance : "Đang tải..."}
+                <label>Số dư :</label>
+                 {user ? user.balance : "Đang tải..."} đ
               </span>
               <a
                 className="pc-head-link dropdown-toggle arrow-none me-0"
