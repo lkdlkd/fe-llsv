@@ -104,9 +104,8 @@ function Home() {
                     {user ? user.tongnapthang : "Đang tải..."}
                   </h4>
                   <h6 className="mb-0">
-                    Tổng nạp tháng{" "}
-                    {new Date().toLocaleString("default", { month: "long" })}
-                  </h6>
+                    Tổng nạp tháng {new Date().getMonth() + 1}
+                    </h6>
                 </div>
               </div>
             </div>
