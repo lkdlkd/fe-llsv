@@ -40,12 +40,12 @@ const Danhsachdon = () => {
   const uniqueTypes = Array.from(new Set(servers.map((server) => server.type)));
   const categoriesForType = selectedType
     ? Array.from(
-        new Set(
-          servers
-            .filter((server) => server.type === selectedType)
-            .map((server) => server.category)
-        )
+      new Set(
+        servers
+          .filter((server) => server.type === selectedType)
+          .map((server) => server.category)
       )
+    )
     : [];
 
   // Khi thay đổi type thì reset category
@@ -213,87 +213,83 @@ const Danhsachdon = () => {
               </div>
             </div>
 
-            <div className="table-responsive">
+            <div className="table-responsive table-bordered">
               {loadingOrders ? (
-                // Spinner / Loading indicator
                 <div className="spinner-container">
                   <div className="spinner"></div>
                   <p>Đang tải dữ liệu...</p>
                 </div>
               ) : orders.length > 0 ? (
-                <div className="table-responsive">
-                  <table className="table table-bordered table-hover table-striped fw-bold">
-                    <thead>
-                      <tr>
-                        <th>STT</th>
-                        <th>Mã đơn</th>
-                        <th>Username</th>
-                        <th>Link</th>
-                        <th>Server</th>
-                        <th>Bắt đầu</th>
-                        <th>Đã chạy</th>
-                        <th>Số lượng mua</th>
-                        <th>Trạng thái</th>
-                        {selectedCategory === "BÌNH LUẬN" && <th>Bình luận</th>}
-                        <th>Ghi chú</th>
-                        <th>Ngày tạo</th>
-                      </tr>
-                    </thead>
-                    <tbody className="fw-bold">
-                      {orders.map((order, index) => (
-                        <tr key={order.id}>
-                          <td>{index + 1}</td>
-                          <td>{order.Madon}</td>
-                          <td>{order.username}</td>
-                          <td>{order.link}</td>
-                          <td>{order.namesv}</td>
-                          <td>{order.start}</td>
-                          <td>{order.dachay}</td>
-                          <td>{order.quantity}</td>
-                          <td>
-                            {order.status === "Completed" ? (
-                              <span className="badge badge-badge badge-success">
-                                Hoàn thành
-                              </span>
-                            ) : order.status === "In progress" ||
-                              order.status === "Processing" ||
-                              order.status === "Pending" ? (
-                              <span className="badge badge-badge bg-primary">
-                                Đang chạy
-                              </span>
-                            ) : order.status === "Canceled" ? (
-                              <span className="badge badge-badge badge-danger">
-                                Đã hủy
-                              </span>
-                            ) : (
-                              <span>{order.status}</span>
-                            )}
-                          </td>
-                          {selectedCategory === "BÌNH LUẬN" && (
-                            <td>
-                              {order.category === "BÌNH LUẬN"
-                                ? order.comments || "Không có bình luận"
-                                : ""}
-                            </td>
+                <table className="table table-bordered table-hover table-striped fw-bold">
+                  <thead>
+                    <tr>
+                      <th>STT</th>
+                      <th>Mã đơn</th>
+                      <th>Username</th>
+                      <th>Link</th>
+                      <th>Server</th>
+                      <th>Bắt đầu</th>
+                      <th>Đã chạy</th>
+                      <th>Số lượng mua</th>
+                      <th>Trạng thái</th>
+                      {selectedCategory === "BÌNH LUẬN" && <th>Bình luận</th>}
+                      <th>Ghi chú</th>
+                      <th>Ngày tạo</th>
+                    </tr>
+                  </thead>
+                  <tbody className="fw-bold">
+                    {orders.map((order, index) => (
+                      <tr key={order.id}  >
+                        <td>{index + 1}</td>
+                        <td>{order.Madon}</td>
+                        <td >{order.username}</td>
+                        <td >
+                          {order.link}
+                        </td>
+                        <td >{order.namesv}</td>
+                        <td>{order.start}</td>
+                        <td>{order.dachay}</td>
+                        <td>{order.quantity}</td>
+                        <td>
+                          {order.status === "Completed" ? (
+                            <span className="badge badge-success">Hoàn thành</span>
+                          ) : order.status === "In progress" ||
+                            order.status === "Processing" ||
+                            order.status === "Pending" ? (
+                            <span className="badge bg-primary">Đang chạy</span>
+                          ) : order.status === "Canceled" ? (
+                            <span className="badge badge-danger">Đã hủy</span>
+                          ) : (
+                            <span>{order.status}</span>
                           )}
-                          <td>{order.note}</td>
-                          <td>{new Date(order.createdAt).toLocaleString("vi-VN", {
+                        </td>
+                        {selectedCategory === "BÌNH LUẬN" && (
+                          <td >
+                            {order.category === "BÌNH LUẬN"
+                              ? order.comments || "Không có bình luận"
+                              : ""}
+                          </td>
+                        )}
+                        <td >{order.note}</td>
+                        <td>
+                          {new Date(order.createdAt).toLocaleString("vi-VN", {
                             day: "2-digit",
                             month: "2-digit",
                             year: "numeric",
                             hour: "2-digit",
                             minute: "2-digit",
                             second: "2-digit",
-                          })}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                          })}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               ) : (
                 <p>Không có đơn hàng nào.</p>
               )}
             </div>
+
             {orders.length > 0 && (
               <div className="pagination-controls">
                 <button

@@ -1,14 +1,22 @@
 import React, { useState, useEffect } from "react";
-import { fetchUserInfo, fetchBanks } from "../../utils/api"; // Import các hàm API
-// import "../../App.css"; // Import file CSS nếu cần
+import axios from "axios";
+import { fetchUserInfo, fetchBanks, rechargeCard, getThecao } from "../../utils/api";
 import Swal from "sweetalert2";
 
 function Naptien() {
   const [banks, setBanks] = useState([]);
   const [user, setUser] = useState({});
-  const username = localStorage.getItem("username");
   const [message, setMessage] = useState("");
+  const username = localStorage.getItem("username");
   const token = localStorage.getItem("token");
+  const [thecao, setTransactions] = useState([]);
+  // State lưu thông tin thẻ cào
+  const [cardData, setCardData] = useState({
+    card_type: "VIETTEL",
+    card_value: "10000",
+    card_seri: "",
+    card_code: "",
+  });
 
   // Lấy thông tin người dùng khi component load
   useEffect(() => {
@@ -17,9 +25,7 @@ function Naptien() {
         const userData = await fetchUserInfo(username, token);
         setUser(userData);
       } catch (error) {
-        setMessage(
-          error.message || "Có lỗi xảy ra, vui lòng thử lại!"
-        );
+        setMessage(error.message || "Có lỗi xảy ra, vui lòng thử lại!");
         console.error("Lỗi khi lấy thông tin user", error);
       }
     };
@@ -39,34 +45,90 @@ function Naptien() {
     if (token) loadBanks();
   }, [token]);
 
+
+  useEffect(() => {
+    const fetchTransactions = async () => {
+      try {
+        const data = await getThecao(token);
+        setTransactions(data);
+      } catch (err) {
+        setMessage(err);
+      }
+    };
+
+    if (token) {
+      fetchTransactions();
+    } else {
+      setMessage("Chưa có token đăng nhập.");
+    }
+  }, [token]);
   const handleCopy = (text) => {
-    navigator.clipboard.writeText(text)
-      .then(() => Swal.fire({
+    navigator.clipboard
+      .writeText(text)
+      .then(() =>
+        Swal.fire({
+          title: "Thành công",
+          text: `Copy thành công`,
+          icon: "success",
+          confirmButtonText: "Xác nhận",
+        })
+      )
+      .catch((err) => console.error("Copy error:", err));
+  };
+
+  // Cập nhật state cho từng input
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setCardData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  // Hàm xử lý nạp thẻ cào sử dụng state thay vì FormData
+  const handleRechargeCard = async (e) => {
+    e.preventDefault();
+    const { card_type, card_value, card_seri, card_code } = cardData;
+    // console.log("da", cardData)
+    try {
+      const res = await rechargeCard({
+        card_type,
+        card_value,
+        card_seri,
+        card_code,
+        token: token,
+      });
+      Swal.fire({
         title: "Thành công",
-        text: `copy thành công `,
+        text: res.message,
         icon: "success",
-        confirmButtonText: "Xác nhận",
-      }))
-      .catch(err => console.error("Copy error:", err));
+        confirmButtonText: "OK",
+      });
+      // Reset form sau khi nạp thành công (nếu muốn)
+      setCardData({
+        card_type: "VIETTEL",
+        card_value: "10000",
+        card_seri: "",
+        card_code: "",
+      });
+    } catch (error) {
+      console.error("Lỗi nạp thẻ:", error);
+      Swal.fire({
+        title: "Lỗi",
+        text: error.error || "Có lỗi xảy ra",
+        icon: "error",
+        confirmButtonText: "OK",
+      });
+    }
   };
 
   if (banks.length === 0) {
     return <div>Loading...</div>;
   }
-
+  console.log("tc ", thecao)
   return (
     <div className="row">
-      {/* <div className="col-md-12 mb-3">
-        <div className="row">
-          <div className="col-6 d-grid gap-2">
-            <a href="" className="btn btn-primary">Ngân hàng</a>
-          </div>
-          <div className="col-6 d-grid gap-2">
-            <a href="" className="btn btn-outline-primary">Thẻ cào</a>
-          </div>
-        </div>
-      </div> */}
-
+      {/* Phần thông tin ngân hàng và nạp tiền qua chuyển khoản, quét mã QR */}
       <div className="col-md-12">
         <div className="card">
           <div className="card-header">
@@ -75,134 +137,157 @@ function Naptien() {
           <div className="card-body">
             <div className="alert alert-danger mb-0">
               <ul className="mb-0">
-                <li className="fw-bold text-dark">Vui lòng nạp đúng tài khoản và nội dung</li>
-                <li className="fw-bold text-dark">Sai nội dung hoặc quên không có nội dung bị phạt 20% (ví dụ nạp 100k còn 80k)</li>
-                <li className="fw-bold text-dark">Nạp dưới min của web yêu cầu (mất tiền)</li>
-                <li className="fw-bold text-dark">Không hỗ trợ nạp rồi rút ra với bất kì lý do gì</li>
-                <li className="fw-bold text-dark">Sau 10p nếu chưa thấy tiền về tài khoản thì liên hệ trực tiếp Admin.</li>
+                <li className="fw-bold text-dark">
+                  Vui lòng nạp đúng tài khoản và nội dung
+                </li>
+                <li className="fw-bold text-dark">
+                  Sai nội dung hoặc quên không có nội dung bị phạt 20% (ví dụ nạp
+                  100k còn 80k)
+                </li>
+                <li className="fw-bold text-dark">
+                  Nạp dưới min của web yêu cầu (mất tiền)
+                </li>
+                <li className="fw-bold text-dark">
+                  Không hỗ trợ nạp rồi rút ra với bất kì lý do gì
+                </li>
+                <li className="fw-bold text-dark">
+                  Sau 10p nếu chưa thấy tiền về tài khoản thì liên hệ trực tiếp Admin.
+                </li>
               </ul>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="col-md-12">
-        {/* <div className="table-responsive">
-          <table className="table table-striped table-bordered table-hover">
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Số tiền lớn hơn hoặc bằng</th>
-                <th>Khuyến mãi thêm</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>dd</td>
-                <td>
-                  <span className="badge bg-primary">100.000 VNĐ</span>
-                </td>
-                <td>
-                  <span className="badge bg-success">10 %</span>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div> */}
-        {banks.map((bank) => (
-          <div key={bank._id} className="card">
-            <div className="card-body">
-              {/* <h4 className="card-title mb-3">Thanh toán hoá đơn - {bank.bank_name}</h4> */}
-              <div className="row">
-                <div className="col-md-6">
-                  <div className="py-3 text-center bg-light-primary rounded-2 fw-bold mb-4">
-                    Nạp tiền qua chuyển khoản
-                  </div>
-                  <table className="table table-row-dashed table-row-gray-300 gy-7">
-                    <tbody>
-                      <tr>
-                        <td>Ngân Hàng</td>
-                        <td>
-                          <p className="text-info fw-bolder ng-binding bank-name"
-                            style={{ cursor: "pointer", color: "red", display: "inline-block" }}>
-                            {bank.bank_name}
-                          </p>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>Tên chủ tài khoản</td>
-                        <td>
-                          <p className="text-info fw-bolder ng-binding account-owner"
-                            style={{ cursor: "pointer", color: "red", display: "inline-block" }}>
-                            {bank.account_name}
-                          </p>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>Số tài khoản</td>
-                        <td>
-                          <p className="text-info fw-bolder ng-binding account-number"
-                            style={{ cursor: "pointer", color: "red", display: "inline-block" }}>
-                            {bank.account_number}
-                          </p>
-                          <button
-                            type="button"
-                            className="btn btn-primary text-sm btn-sm ml-3 btn-copy"
-                            onClick={() => handleCopy(bank.account_number)}
-                          >
-                            <span><i className="fas fa-copy"></i></span>
-                          </button>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>Nội dung chuyển khoản</td>
-                        <td>
-                          <p className="text-info fw-bolder ng-binding content-tranfer"
-                            style={{ cursor: "pointer", color: "red", display: "inline-block" }}>
-                            lsv {user.username}
-                          </p>
-                          <button
-                            type="button"
-                            className="btn btn-primary text-sm btn-sm ml-3 btn-copy"
-                            onClick={() => handleCopy(`likesubviet ${user.username}`)}
-                          >
-                            <span><i className="fas fa-copy"></i></span>
-                          </button>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>Nạp ít nhất</td>
-                        <td>
-                          <p
-                            className="text-info fw-bolder ng-binding amount-money"
-                            style={{ cursor: "pointer", color: "red", display: "inline-block" }}
-                          >
-                            {bank?.min_recharge ? Number(bank.min_recharge).toLocaleString("vi-VN") : "0"}đ
-                          </p>
-                        </td>
-
-                      </tr>
-                    </tbody>
-                  </table>
+      {banks.map((bank) => (
+        <div key={bank._id} className="card">
+          <div className="card-body">
+            <div className="row">
+              <div className="col-md-6">
+                <div className="py-3 text-center bg-light-primary rounded-2 fw-bold mb-4">
+                  Nạp tiền qua chuyển khoản
                 </div>
-                <div className="col-md-6">
-                  <div className="py-3 text-center bg-light-primary rounded-2 fw-bold mb-4">
-                    Nạp tiền qua quét mã QR
-                  </div>
-                  <div className="text-center mb-3">
-                    <img
-                      src={`https://img.vietqr.io/image/${bank.bank_name}-${bank.account_number}-qronly2.jpg?accountName=${bank.account_name}&addInfo=likesubviet ${username}&amount=${bank.min_recharge}`}
-                      alt="QR CODE"
-                      width="300"
-                    />
-                  </div>
+                <table className="table table-row-dashed table-row-gray-300 gy-7">
+                  <tbody>
+                    <tr>
+                      <td>Ngân Hàng</td>
+                      <td>
+                        <p
+                          className="text-info fw-bolder ng-binding bank-name"
+                          style={{
+                            cursor: "pointer",
+                            color: "red",
+                            display: "inline-block",
+                          }}
+                        >
+                          {bank.bank_name}
+                        </p>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>Tên chủ tài khoản</td>
+                      <td>
+                        <p
+                          className="text-info fw-bolder ng-binding account-owner"
+                          style={{
+                            cursor: "pointer",
+                            color: "red",
+                            display: "inline-block",
+                          }}
+                        >
+                          {bank.account_name}
+                        </p>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>Số tài khoản</td>
+                      <td>
+                        <p
+                          className="text-info fw-bolder ng-binding account-number"
+                          style={{
+                            cursor: "pointer",
+                            color: "red",
+                            display: "inline-block",
+                          }}
+                        >
+                          {bank.account_number}
+                        </p>
+                        <button
+                          type="button"
+                          className="btn btn-primary text-sm btn-sm ml-3 btn-copy"
+                          onClick={() => handleCopy(bank.account_number)}
+                        >
+                          <span>
+                            <i className="fas fa-copy"></i>
+                          </span>
+                        </button>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>Nội dung chuyển khoản</td>
+                      <td>
+                        <p
+                          className="text-info fw-bolder ng-binding content-tranfer"
+                          style={{
+                            cursor: "pointer",
+                            color: "red",
+                            display: "inline-block",
+                          }}
+                        >
+                          lsv {user.username}
+                        </p>
+                        <button
+                          type="button"
+                          className="btn btn-primary text-sm btn-sm ml-3 btn-copy"
+                          onClick={() =>
+                            handleCopy(`likesubviet ${user.username}`)
+                          }
+                        >
+                          <span>
+                            <i className="fas fa-copy"></i>
+                          </span>
+                        </button>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>Nạp ít nhất</td>
+                      <td>
+                        <p
+                          className="text-info fw-bolder ng-binding amount-money"
+                          style={{
+                            cursor: "pointer",
+                            color: "red",
+                            display: "inline-block",
+                          }}
+                        >
+                          {bank?.min_recharge
+                            ? Number(bank.min_recharge).toLocaleString("vi-VN")
+                            : "0"}
+                          đ
+                        </p>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div className="col-md-6">
+                <div className="py-3 text-center bg-light-primary rounded-2 fw-bold mb-4">
+                  Nạp tiền qua quét mã QR
+                </div>
+                <div className="text-center mb-3">
+                  <img
+                    src={`https://img.vietqr.io/image/${bank.bank_name}-${bank.account_number}-qronly2.jpg?accountName=${bank.account_name}&addInfo=likesubviet ${username}&amount=${bank.min_recharge}`}
+                    alt="QR CODE"
+                    width="300"
+                  />
                 </div>
               </div>
             </div>
           </div>
-        ))}
-        {message && <p className="text-danger">{message}</p>}
-      </div>
+        </div>
+      ))}
+
+      {message && <p className="text-danger">{message}</p>}
 
       <div className="col-md-12">
         <div className="card">
@@ -210,23 +295,35 @@ function Naptien() {
             <h5 className="card-title">Nạp thẻ cào</h5>
           </div>
           <div className="card-body">
-            <form action="" method="POST">
+            <form onSubmit={handleRechargeCard}>
               <div className="row">
                 <div className="col-md-3">
                   <div className="form-group">
                     <label className="form-label">Loại thẻ</label>
-                    <select name="card_type" id="card_type" className="form-control">
-                      <option value="VIETTEL">Viettel</option>
-                      <option value="MOBIFONE">Mobifone</option>
-                      <option value="VINAPHONE">Vinaphone</option>
-                      <option value="VIETNAMMOBILE">Vietnamobile</option>
+                    <select
+                      name="card_type"
+                      id="card_type"
+                      className="form-control"
+                      value={cardData.card_type}
+                      onChange={handleInputChange}
+                    >
+                      <option value="VIETTEL">Viettel (Chiết khấu 25%)</option>
+                      <option value="MOBIFONE">Mobifone (Chiết khấu 25%)</option>
+                      <option value="VINAPHONE">Vinaphone (Chiết khấu 25%)</option>
+                      <option value="VIETNAMMOBILE">Vietnamobile (Chiết khấu 25%)</option>
                     </select>
                   </div>
                 </div>
                 <div className="col-md-3">
                   <div className="form-group">
                     <label className="form-label">Mệnh giá</label>
-                    <select name="card_value" id="card_value" className="form-control">
+                    <select
+                      name="card_value"
+                      id="card_value"
+                      className="form-control"
+                      value={cardData.card_value}
+                      onChange={handleInputChange}
+                    >
                       <option value="10000">10,000 VNĐ</option>
                       <option value="20000">20,000 VNĐ</option>
                       <option value="30000">30,000 VNĐ</option>
@@ -242,17 +339,33 @@ function Naptien() {
                 <div className="col-md-3">
                   <div className="form-group">
                     <label className="form-label">Seri</label>
-                    <input type="text" name="card_seri" id="card_seri" className="form-control" placeholder="Nhập dữ liệu...." />
+                    <input
+                      type="text"
+                      name="card_seri"
+                      id="card_seri"
+                      className="form-control"
+                      placeholder="Nhập dữ liệu...."
+                      value={cardData.card_seri}
+                      onChange={handleInputChange}
+                    />
                   </div>
                 </div>
                 <div className="col-md-3">
                   <div className="form-group">
                     <label className="form-label">Mã thẻ</label>
-                    <input type="text" name="card_code" id="card_code" className="form-control" placeholder="Nhập dữ liệu...." />
+                    <input
+                      type="text"
+                      name="card_code"
+                      id="card_code"
+                      className="form-control"
+                      placeholder="Nhập dữ liệu...."
+                      value={cardData.card_code}
+                      onChange={handleInputChange}
+                    />
                   </div>
                 </div>
                 <div className="col-md-12">
-                  <button type="submit" className="btn btn-primary col-12" id="btnRechargeCard">
+                  <button type="submit" className="btn btn-primary col-12">
                     Nạp thẻ cào
                   </button>
                 </div>
@@ -261,49 +374,8 @@ function Naptien() {
           </div>
         </div>
       </div>
-      {/* <div className="col-md-12">
-        <div class="card">
-          <div class="card-header">
-            <h5 class="card-title">Lịch sử nạp thẻ cào</h5>
-          </div>
-          <div class="card-body">
-            <div class="table-responsive">
-              <table class="table table-striped table-bordered table-hover">
-                <thead>
-                  <tr>
-                    <th>ID</th>
 
-                    <th>Loại thẻ</th>
-                    <th>Mệnh giá</th>
-                    <th>Seri</th>
-                    <th>Mã thẻ</th>
-                    <th>Thực nhận</th>
-                    <th>Trạng thái</th>
-                    <th>Thời gian gửi</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td colspan="12" class="text-center">
-                      <div class="d-flex justify-content-center align-items-center">
-                        <div class="text-center">
-                          <img src="" alt="Không tìm thấy dữ liệu" class="img-fluid" style={{ maxwidth: "100px" }} />
-                          <h4 class="text-muted">Không tìm thấy dữ liệu</h4>
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
-
-                </tbody>
-              </table>
-              <div class="d-flex justify-content-center align-items-center">
-
-              </div>
-            </div>
-          </div>
-        </div>
-      </div> */}
-
+      {/* Các bảng lịch sử giao dịch */}
       <div className="col-md-12">
         <div className="card">
           <div className="card-header">
@@ -327,36 +399,15 @@ function Naptien() {
                 </thead>
                 <tbody>
                   <tr>
-                    <td colspan="12" class="text-center">
-                      <div class="d-flex justify-content-center align-items-center">
-                        <div class="text-center">
-                          <h4 class="text-muted">Không tìm thấy dữ liệu</h4>
+                    <td colSpan="12" className="text-center">
+                      <div className="d-flex justify-content-center align-items-center">
+                        <div className="text-center">
+                          <h4 className="text-muted">Không tìm thấy dữ liệu</h4>
                         </div>
                       </div>
                     </td>
                   </tr>
-                  {/* <tr>
-                    <td>1</td>
-                    <td>
-                      <span className="badge bg-success"></span>
-                      <span className="badge bg-primary">10000</span>
-                    </td>
-                    <td>22:22 20/10/2025</td>
-                    <td>
-                      <span className="badge bg-primary">Nạp tiền</span>
-                    </td>
-                    <td>ACB</td>
-                    <td>Không xác định</td>
-                    <td>100.000 VNĐ</td>
-                    <td>
-                      <span className="badge bg-success">Thành công</span>
-                    </td>
-                    <td>
-                      <textarea className="form-control" rows="1" readOnly>
-                        lê khánh đăng chuyển tiền nd : likesubviet user
-                      </textarea>
-                    </td>
-                  </tr> */}
+                  {/* Các dòng dữ liệu lịch sử */}
                 </tbody>
               </table>
             </div>
@@ -373,6 +424,7 @@ function Naptien() {
             <div className="table-responsive">
               <table className="table table-striped table-bordered table-hover">
                 <thead>
+
                   <tr>
                     <th>ID</th>
                     <th>Thời gian</th>
@@ -385,29 +437,47 @@ function Naptien() {
                   </tr>
                 </thead>
                 <tbody>
-                  <tr>
-                    <td colspan="12" class="text-center">
-                      <div class="d-flex justify-content-center align-items-center">
-                        <div class="text-center">
-                          <h4 class="text-muted">Không tìm thấy dữ liệu</h4>
+                  {thecao.map((thecao, index) => (
+
+                    <tr key={index}>
+                      {/* <td colSpan="12" className="text-center">
+                      <div className="d-flex justify-content-center align-items-center">
+                        <div className="text-center">
+                          <h4 className="text-muted">Không tìm thấy dữ liệu</h4>
                         </div>
                       </div>
-                    </td>
-                  </tr>
-                  {/* <tr>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td>VNĐ</td>
-                    <td></td>
-                    <td></td>
-                    <td>VNĐ</td>
-                    <td>
-                      <span className="badge bg-warning">Chờ xử lý</span>
-                      <span className="badge bg-success">Thành công</span>
-                      <span className="badge bg-danger">Thất bại</span>
-                    </td>
-                  </tr> */}
+                    </td> */}
+                      <td>{index + 1}</td>
+                      <td>
+                        {new Date(thecao.createdAt).toLocaleString("vi-VN", {
+                          day: "2-digit",
+                          month: "2-digit",
+                          year: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                          second: "2-digit",
+                        })}
+                      </td>
+                      <td>{thecao.type}</td>
+                      <td>{thecao.amount}</td>
+                      <td>{thecao.serial}</td>
+                      <td>{thecao.code}</td>
+                      <td>{thecao.real_amount}</td>
+                      <td>
+                        {thecao.status === "success" ? (
+                          <span className="badge badge-success">Hoàn thành</span>
+                        ) : thecao.status === "pending" ? (
+                          <span className="badge bg-primary">Đang xử lý</span>
+                        ) : thecao.status === "warning" ? (
+                          <span className="badge bg-primary">Sai mệnh giá</span>
+                        ) : thecao.status === "failed" ? (
+                          <span className="badge badge-danger">Thẻ lỗi</span>
+                        ) : (
+                          <span>{thecao.status}</span>
+                        )}
+                      </td>                      </tr>
+                  ))}
+                  {/* Các dòng dữ liệu lịch sử */}
                 </tbody>
               </table>
               <div className="d-flex justify-content-center align-items-center"></div>

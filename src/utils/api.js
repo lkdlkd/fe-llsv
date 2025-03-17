@@ -158,3 +158,37 @@ export const fetchUserHistory = async (token, username, page, limit) => {
       : { message: "Có lỗi xảy ra, vui lòng thử lại!" };
   }
 };
+// Hàm gọi API nạp thẻ cào
+export const rechargeCard = async ({ card_type, card_value, card_seri, card_code, token }) => {
+  try {
+    const response = await axios.post(
+      `${API_URL}/api/transactions`,
+      {
+        card_type,
+        card_value,
+        card_seri,
+        card_code,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error.message;
+  }
+};
+export const getThecao = async (token) => {
+  try {
+    const response = await axios.get(`${API_URL}/api/thecao`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data.transactions;
+  } catch (error) {
+    throw error.response?.data || error.message;
+  }
+};

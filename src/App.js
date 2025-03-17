@@ -8,7 +8,7 @@ import Layout from "./components/Layout ";
 import Quantri from "./components/admin/Quantri";
 import SmmForm from "./components/admin/SmmForm";
 import Smmdv from "./components/admin/Smmdv";
-import ServerFilterForm from "./Page/ServerFilterForm ";
+import ServerFilterForm from "./Page/ServerFilterForm";
 import UserList from "./components/admin/UserList";
 import Danhsachdon from "./components/Danhsachdon";
 import Alldon from "./components/admin/Alldon";
