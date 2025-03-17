@@ -35,13 +35,33 @@ const Smmdv = () => {
   const [smmPartners, setSmmPartners] = useState([]);
   const [services, setServices] = useState([]); // Dữ liệu từ API bên SMM sẽ lấy về làm danh sách dịch vụ (nếu cần)
   const [server, setServer] = useState([]); // Danh sách dịch vụ SMM (server)
-  const [editMode, setEditMode] = useState(false); // Chế độ sửa hay thêm mới
-  const [editService, setEditService] = useState(null); // Lưu thông tin dịch vụ cần sửa
+  const [editMode, setEditMode] = useState(false);
+  const [editService, setEditService] = useState(null);
 
   useEffect(() => {
     loadSmmPartners();
     loadServers();
   }, []);
+
+  // New useEffect to update service info when serviceId changes
+  useEffect(() => {
+    // Only proceed if there's a non-empty serviceId and services list available
+    if (formData.serviceId && services.length > 0) {
+      // Find service by comparing service id (casting to string if necessary)
+      const selectedService = services.find(
+        (service) => String(service.service) === String(formData.serviceId)
+      );
+      if (selectedService) {
+        setFormData(prev => ({
+          ...prev,
+          min: selectedService.min,
+          max: selectedService.max,
+          rate: selectedService.rate * 25, // Adjust multiplier if needed
+          serviceName: selectedService.name
+        }));
+      }
+    }
+  }, [formData.serviceId, services]);
 
   const loadSmmPartners = async () => {
     try {
@@ -69,18 +89,15 @@ const Smmdv = () => {
     e.preventDefault();
     try {
       if (editMode) {
-        // Sửa dịch vụ
         await updateServerService(editService.id, formData, token);
         alert("Đã sửa dịch vụ thành công!");
       } else {
-        // Thêm mới dịch vụ
         await addServerService(formData, token);
         alert("Đã thêm dịch vụ thành công!");
       }
-      loadServers(); // Cập nhật lại danh sách sau khi thêm/sửa
+      loadServers();
       setEditMode(false);
       setEditService(null);
-      // Reset form nếu cần
       setFormData({
         type: "",
         name: "",
@@ -129,7 +146,6 @@ const Smmdv = () => {
       description: serverItem.description,
       isActive: serverItem.isActive
     };
-    console.log(newFormData);
     setFormData(newFormData);
   };
 
@@ -142,7 +158,7 @@ const Smmdv = () => {
     }
   };
 
-  // Nếu bạn cần xử lý lấy danh sách dịch vụ từ đối tác SMM bên thứ 3 theo DomainSmm
+  // Handler for Domain change which fetches services from a partner
   const handleDomainChange = async (e) => {
     const domain = e.target.value;
     setFormData({ ...formData, DomainSmm: domain, serviceId: "", serviceName: "" });
@@ -164,6 +180,7 @@ const Smmdv = () => {
     }
   };
 
+  // This function is kept in case you prefer selecting a service from a dropdown.
   const handleServiceChange = (e) => {
     const selectedServiceId = e.target.value;
     const selectedService = services.find(
@@ -300,7 +317,7 @@ const Smmdv = () => {
                   value={formData.DomainSmm}
                   onChange={handleDomainChange}
                   required
-                  disabled={editMode} // disable editing in update mode
+                  disabled={editMode}
                 >
                   <option value="">Chọn domain</option>
                   {smmPartners.map((partner) => (
@@ -328,6 +345,17 @@ const Smmdv = () => {
                   </select>
                 )}
 
+                {/* If you want to allow manual entry of serviceId */}
+                <label>Service ID (nhập trực tiếp):</label>
+                <input
+                  type="text"
+                  name="serviceId"
+                  value={formData.serviceId}
+                  onChange={handleChange}
+                  required
+                  disabled={editMode}
+                />
+
                 <label>Giới hạn Min:</label>
                 <input
                   type="number"
@@ -345,7 +373,6 @@ const Smmdv = () => {
                   value={formData.max}
                   onChange={handleChange}
                   required
-                  // disabled={editMode}
                 />
 
                 <label>Giá:</label>
@@ -355,17 +382,6 @@ const Smmdv = () => {
                   value={formData.rate}
                   onChange={handleChange}
                   required
-                />
-
-                <label>Service ID:</label>
-                <input
-                  type="text"
-                  name="serviceId"
-                  value={formData.serviceId}
-                  onChange={handleChange}
-                  required
-                  disabled={editMode}
-
                 />
 
                 <label>Trạng thái:</label>
