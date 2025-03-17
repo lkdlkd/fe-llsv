@@ -91,26 +91,27 @@ const HistoryUser = () => {
                               className="badge badge-info"
                               style={{ backgroundColor: "#43bfe5" }}
                             >
-                              {item.tienhientai}
+                              {Number(item.tienhientai).toLocaleString("vi-VN")}
                             </span>{" "}
-                            {item.hanhdong === "Cộng tiền" ? (
+                            {item.hanhdong.toLowerCase().includes("nạp tiền") ? (
                               <>
                                 +<span className="badge" style={{ backgroundColor: "#e53935" }}>
-                                  {item.tongtien}
+                                  {Number(item.tongtien).toLocaleString("vi-VN")}đ
                                 </span>{" "}
                               </>
                             ) : (
                               <>
                                 -<span className="badge" style={{ backgroundColor: "#e53935" }}>
-                                  {item.tongtien}
+                                  {Number(item.tongtien).toLocaleString("vi-VN")}
                                 </span>{" "}
                               </>
                             )}
                             ={" "}
                             <span className="badge badge-success">
-                              {item.tienconlai}
+                              {Number(item.tienconlai).toLocaleString("vi-VN")}
                             </span>
                           </td>
+
                           <td>
                             {new Date(item.createdAt).toLocaleString("vi-VN", {
                               day: "2-digit",
