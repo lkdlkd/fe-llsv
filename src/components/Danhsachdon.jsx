@@ -220,7 +220,7 @@ const Danhsachdon = () => {
                   <p>Đang tải dữ liệu...</p>
                 </div>
               ) : orders.length > 0 ? (
-                <table className="table table-bordered table-hover table-striped fw-bold">
+                <table className="table-hover table-bordered table-striped table-vcenter  orders-table">
                   <thead>
                     <tr>
                       <th>STT</th>
@@ -237,7 +237,7 @@ const Danhsachdon = () => {
                       <th>Ngày tạo</th>
                     </tr>
                   </thead>
-                  <tbody className="fw-bold">
+                  <tbody className="">
                     {orders.map((order, index) => (
                       <tr key={order.id}  >
                         <td>{index + 1}</td>
@@ -246,7 +246,7 @@ const Danhsachdon = () => {
                         <td >
                           {order.link}
                         </td>
-                        <td >{order.namesv}</td>
+                        <td >{order.maychu}{order.namesv}</td>
                         <td>{order.start}</td>
                         <td>{order.dachay}</td>
                         <td>{order.quantity}</td>
@@ -291,19 +291,23 @@ const Danhsachdon = () => {
             </div>
 
             {orders.length > 0 && (
-              <div className="pagination-controls">
+              <div className="pagination d-flex justify-content-between align-items-center mt-3">
                 <button
+                  className="btn btn-secondary"
+
                   onClick={() =>
                     setCurrentPage((prev) => Math.max(prev - 1, 1))
                   }
                   disabled={currentPage === 1}
                 >
-                  Previous
+                  Trước
                 </button>
                 <span>
-                  {currentPage} / {totalPages}
+                  Trang {currentPage} / {totalPages}
                 </span>
                 <button
+                  className="btn btn-secondary"
+
                   onClick={() =>
                     setCurrentPage((prev) =>
                       Math.min(prev + 1, totalPages)
@@ -311,7 +315,7 @@ const Danhsachdon = () => {
                   }
                   disabled={currentPage === totalPages}
                 >
-                  Next
+                  Sau
                 </button>
               </div>
             )}

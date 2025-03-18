@@ -1,11 +1,12 @@
 import React, { useState } from "react";
-import { toast } from "react-toastify";
+import Swal from "sweetalert2"; // Sử dụng SweetAlert2
 import "../../style/UserEdit.css";  // Import file CSS
 import { updateUser } from "../../utils/apiAdmin"; // Import hàm updateUser
 
 const UserEdit = ({ user, onClose, onUserUpdated }) => {
+  // Giả sử user có các trường: username, role, balance, tongnap
   const [formData, setFormData] = useState(user);
-  const token = localStorage.getItem('token');
+  const token = localStorage.getItem("token");
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -15,11 +16,18 @@ const UserEdit = ({ user, onClose, onUserUpdated }) => {
     e.preventDefault();
     try {
       await updateUser(user._id, formData, token);
-      toast.success("Cập nhật thành công!");
+      Swal.fire({
+        icon: "success",
+        title: "Cập nhật thành công!",
+      });
       onUserUpdated();
       onClose();
     } catch (error) {
-      toast.error("Lỗi khi cập nhật!");
+      Swal.fire({
+        icon: "error",
+        title: "Lỗi khi cập nhật!",
+        text: error.message || "Có lỗi xảy ra. Vui lòng thử lại sau.",
+      });
     }
   };
 
@@ -35,13 +43,13 @@ const UserEdit = ({ user, onClose, onUserUpdated }) => {
           onChange={handleChange}
           disabled
         /><br />
-        
+
         <label>Role:</label>
         <select name="role" value={formData.role} onChange={handleChange}>
           <option value="user">User</option>
           <option value="admin">Admin</option>
         </select><br />
-        
+
         <label>Balance:</label>
         <input
           type="number"
@@ -49,7 +57,15 @@ const UserEdit = ({ user, onClose, onUserUpdated }) => {
           value={formData.balance}
           onChange={handleChange}
         /><br />
-        
+
+        <label>Tổng nạp:</label>
+        <input
+          type="number"
+          name="tongnap"
+          value={formData.tongnap}
+          onChange={handleChange}
+        /><br />
+
         <button type="submit">Lưu</button>
         <button type="button" onClick={onClose}>Hủy</button>
       </form>

@@ -65,7 +65,9 @@ const HistoryUser = () => {
                 <p>Đang tải dữ liệu...</p>
               ) : history && history.length > 0 ? (
                 <div className="orders-table-container">
-                  <table className="table table-bordered table-hover table-striped fw-bold">
+                  {/* <table className="table table-bordered table-hover table-striped fw-bold"> */}
+                  <table className="table-hover table-bordered table-striped table-vcenter orders-table">
+
                     <thead>
                       <tr>
                         <th>STT</th>
@@ -132,28 +134,31 @@ const HistoryUser = () => {
                 <p>Không có đơn hàng nào.</p>
               )}
             </div>
-          </div>
-          {history && history.length > 0 && (
-            <div className="pagination-controls ">
-              <button
-                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                disabled={currentPage === 1}
-              >
-                Previous
-              </button>
-              <span>
-                {currentPage} / {totalPages}
-              </span>
-              <button
-                onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-                disabled={currentPage === totalPages}
-              >
-                Next
-              </button>
-            </div>
-          )}
-        </div>
+            {history && history.length > 0 && (
+              <div className="pagination d-flex justify-content-between align-items-center mt-3">
+                <button
+                  className="btn btn-secondary"
 
+                  onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                  disabled={currentPage === 1}
+                >
+                  Trước
+                </button>
+                <span>
+                  Trang {currentPage} / {totalPages}
+                </span>
+                <button
+                  className="btn btn-secondary"
+
+                  onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                  disabled={currentPage === totalPages}
+                >
+                  Sau
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );
