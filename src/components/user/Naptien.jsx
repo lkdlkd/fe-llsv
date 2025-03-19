@@ -261,7 +261,7 @@ function Naptien() {
                           }}
                         >
                           {bank?.min_recharge
-                            ? Number(bank.min_recharge).toLocaleString("vi-VN")
+                            ? Number(bank.min_recharge).toLocaleString("en-US")
                             : "0"}
                           đ
                         </p>

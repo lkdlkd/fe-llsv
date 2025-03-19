@@ -144,19 +144,19 @@ const Alldon = () => {
                     />
                   </div>
                   <div className="form-group mb-3">
-                  <button
-                    type="submit"
-                    className="btn btn-primary w-100"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      loadOrders();
-                    }}
-                  >
-                    <i className="fas fa-search"></i> Tìm kiếm
-                  </button>
+                    <button
+                      type="submit"
+                      className="btn btn-primary w-100"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        loadOrders();
+                      }}
+                    >
+                      <i className="fas fa-search"></i> Tìm kiếm
+                    </button>
+                  </div>
                 </div>
-                </div>
-                
+
                 <div className="col-md-4 ">
                   <div className="form-group mb-3">
                     <label>CHỌN NỀN TẢNG:</label>
@@ -195,19 +195,21 @@ const Alldon = () => {
                   <table className="table-hover table-bordered table-striped table-vcenter orders-table">
                     <thead>
                       <tr>
-                      <th>STT</th>
-                      <th>Mã đơn</th>
-                      <th>Username</th>
-                      <th>Link</th>
-                      <th>Server</th>
-                      <th>Bắt đầu</th>
-                      <th>Đã chạy</th>
-                      <th>Số lượng mua</th>
-                      <th>Trạng thái</th>
-                      {selectedCategory === "BÌNH LUẬN" && <th>Bình luận</th>}
-                      <th>Ghi chú</th>
-                      <th>Ngày tạo</th>
-                      <th>Hành động</th>
+                        <th>STT</th>
+                        <th>Mã đơn</th>
+                        <th>Username</th>
+                        <th>Link</th>
+                        <th>Server</th>
+                        <th>Bắt đầu</th>
+                        <th>Đã chạy</th>
+                        <th>Số lượng mua</th>
+                        <th>Giá</th>
+                        <th>Tổng tiền</th>
+                        <th>Trạng thái</th>
+                        {selectedCategory === "BÌNH LUẬN" && <th>Bình luận</th>}
+                        <th>Ghi chú</th>
+                        <th>Ngày tạo</th>
+                        <th>Hành động</th>
 
                         {/* <th>STT</th>
                         <th>Mã đơn</th>
@@ -227,11 +229,19 @@ const Alldon = () => {
                           <td>{index + 1}</td>
                           <td>{order.Madon}</td>
                           <td>{order.username}</td>
-                          <td>{order.link}</td>
+                          <td style={{
+                            maxWidth: "250px",
+                            whiteSpace: "normal",         // cho phép xuống dòng
+                            wordWrap: "break-word",       // tự động xuống dòng nếu từ quá dài
+                            overflowWrap: "break-word"    // tương tự wordWrap
+                          }}
+                          > {order.link}</td>
                           <td>{order.namesv}</td>
                           <td>{order.start}</td>
                           <td>{order.dachay}</td>
                           <td>{order.quantity}</td>
+                          <td >{Number(order.rate).toLocaleString("en-US")}</td>
+                          <td >{Number(order.totalCost).toLocaleString("en-US")}</td>
                           <td>
                             {order.status === "Completed" ? (
                               <span className="badge badge-success">Hoàn thành</span>

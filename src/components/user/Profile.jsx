@@ -64,7 +64,7 @@ function Profile() {
                                                             <div class="col-md-6 form-group">
                                                                 <label for="balance" class="form-label">Số dư:</label>
                                                                 <input type="text" class="form-control" id="balance" disabled
-                                                                    value={user ? Number(user.balance|| 0).toLocaleString("vi-VN") : "Đang tải..."} />
+                                                                    value={user ? Number(user.balance|| 0).toLocaleString("en-US") : "Đang tải..."} />
                                                             </div>
                                                             <div class="col-md-6 form-group">
                                                                 <label for="balance" class="form-label">Cấp bậc</label>
@@ -74,13 +74,13 @@ function Profile() {
                                                             <div class="col-md-6 form-group">
                                                                 <label for="balance" class="form-label">Tổng nạp tháng</label>
                                                                 <input type="text" class="form-control" id="balance" disabled
-                                                                    value={Number(user.tongnapthang || 0).toLocaleString("vi-VN")}/>
+                                                                    value={Number(user.tongnapthang || 0).toLocaleString("en-US")}/>
                                                             </div>
 
                                                             <div class="col-md-6 form-group">
                                                                 <label for="balance" class="form-label">Tổng nạp</label>
                                                                 <input type="text" class="form-control" id="balance" disabled
-                                                                    value={Number(user.tongnap || 0).toLocaleString("vi-VN")} />
+                                                                    value={Number(user.tongnap || 0).toLocaleString("en-US")} />
                                                             </div>
 
                                                             <div className="col-md-6 form-group">

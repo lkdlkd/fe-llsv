@@ -81,7 +81,7 @@ function Home() {
                 </div>
                 <div className="flex-grow-1 ms-3">
                   <h4 className="mb-0">
-                    {Number(user.balance || 0).toLocaleString("vi-VN")}đ
+                    {Number(user.balance || 0).toLocaleString("en-US")}đ
                   </h4>
                   <h6 className="mb-0">Số dư hiện tại</h6>
                 </div>
@@ -101,7 +101,7 @@ function Home() {
                 </div>
                 <div className="flex-grow-1 ms-3">
                   <h4 className="mb-0">
-                  {Number(user.tongnapthang || 0).toLocaleString("vi-VN")}đ
+                  {Number(user.tongnapthang || 0).toLocaleString("en-US")}đ
                   </h4>
                   <h6 className="mb-0">
                     Tổng nạp tháng {new Date().getMonth() + 1}
@@ -123,7 +123,7 @@ function Home() {
                 </div>
                 <div className="flex-grow-1 ms-3">
                   <h4 className="mb-0">
-                    {Number(user.tongnap || 0).toLocaleString("vi-VN")}đ
+                    {Number(user.tongnap || 0).toLocaleString("en-US")}đ
                   </h4>
                   <h6 className="mb-0">Tổng nạp</h6>
                 </div>

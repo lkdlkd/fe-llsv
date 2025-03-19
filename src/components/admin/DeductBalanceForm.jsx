@@ -44,7 +44,7 @@ const DeductBalanceForm = ({ user, onClose, onUserUpdated }) => {
               <h4>Trừ tiền cho {user.username}</h4>
               <form onSubmit={handleSubmit}>
                 <div className="form-group">
-                  <label>Số tiền cần trừ:</label>
+                  <label>Số tiền cần trừ: {Number(amount).toLocaleString("en-US")}</label>
                   <input
                     type="number"
                     className="form-control"

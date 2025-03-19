@@ -133,8 +133,8 @@ const UserList = () => {
                  
                       </td> */}
                       <td>{user.username}</td>
-                      <td >{Number(user.balance).toLocaleString("vi-VN")} VNĐ</td>
-                      <td >{Number(user.tongnap).toLocaleString("vi-VN")} VNĐ</td>
+                      <td >{Number(user.balance).toLocaleString("en-US")} VNĐ</td>
+                      <td >{Number(user.tongnap).toLocaleString("en-US")} VNĐ</td>
                       <td>{user.capbac}</td>
                       <td> {user.role === "admin" ? (
                         <span className="badge bg-danger">Quản trị viên</span>

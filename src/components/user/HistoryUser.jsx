@@ -87,30 +87,39 @@ const HistoryUser = () => {
                           <td>{item.madon}</td>
                           <td>{item.username}</td>
                           <td>{item.hanhdong}</td>
-                          <td>{item.link}</td>
+                          <td
+                            style={{
+                              maxWidth: "250px",
+                              whiteSpace: "normal",         // cho phép xuống dòng
+                              wordWrap: "break-word",       // tự động xuống dòng nếu từ quá dài
+                              overflowWrap: "break-word"    // tương tự wordWrap
+                            }}
+                          >
+                            {item.link}
+                          </td>
                           <td>
                             <span
                               className="badge badge-info"
                               style={{ backgroundColor: "#43bfe5" }}
                             >
-                              {Number(item.tienhientai).toLocaleString("vi-VN")}
+                              {Number(item.tienhientai).toLocaleString("en-US")}
                             </span>{" "}
                             {item.hanhdong.toLowerCase().includes("nạp tiền") ? (
                               <>
                                 +<span className="badge" style={{ backgroundColor: "#e53935" }}>
-                                  {Number(item.tongtien).toLocaleString("vi-VN")}đ
+                                  {Number(item.tongtien).toLocaleString("en-US")}đ
                                 </span>{" "}
                               </>
                             ) : (
                               <>
                                 -<span className="badge" style={{ backgroundColor: "#e53935" }}>
-                                  {Number(item.tongtien).toLocaleString("vi-VN")}
+                                  {Number(item.tongtien).toLocaleString("en-US")}
                                 </span>{" "}
                               </>
                             )}
                             ={" "}
                             <span className="badge badge-success">
-                              {Number(item.tienconlai).toLocaleString("vi-VN")}
+                              {Number(item.tienconlai).toLocaleString("en-US")}
                             </span>
                           </td>
 

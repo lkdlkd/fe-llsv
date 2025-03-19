@@ -44,7 +44,7 @@ const AddBalanceForm = ({ user, onClose, onUserUpdated }) => {
             <div className="add-balance-form-container">
               <h3>Cộng tiền cho người dùng: {user.username}</h3>
               <form onSubmit={handleSubmit}>
-                <label>Số tiền cần cộng:</label>
+                <label>Số tiền cần cộng: {Number(amount).toLocaleString("en-US")}</label>
                 <input
                   type="number"
                   value={amount}

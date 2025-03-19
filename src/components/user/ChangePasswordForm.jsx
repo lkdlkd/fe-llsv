@@ -22,6 +22,9 @@ const ChangePasswordForm = ({ userId, onPasswordChanged }) => {
     }
     try {
       const data = await changePassword(userId, oldPassword, newPassword, token);
+      if (data.token) {
+        localStorage.setItem("token", data.token);
+      }
       Swal.fire({
         title: "Thành công",
         text: "Đổi mật khẩu thành công",

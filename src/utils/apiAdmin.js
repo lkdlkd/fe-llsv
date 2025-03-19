@@ -238,3 +238,17 @@ export const deductBalance = async (id, amount, token) => {
     throw error.response ? error.response.data : { message: "Lỗi kết nối đến máy chủ" };
   }
 };
+
+export const getDashboardStats = async (token) => {
+  try {
+    const response = await axios.get(`${API_URL}/api/thongke`, {
+      headers: {
+        Authorization: `Bearer ${token}`, 
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Lỗi khi lấy thống kê:", error);
+    throw error;
+  }
+};

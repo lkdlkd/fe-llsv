@@ -60,8 +60,8 @@ function Header({ user }) {
             <li className="dropdown pc-h-item header-user-profile">
               <span className="pc-mtext">
                 <label>Số dư :</label>
-                {user ? Number(user.balance).toLocaleString("vi-VN") : "Đang tải..."} đ
-              </span>
+                {user ? Number(user.balance).toLocaleString("en-US") : "Đang tải..."} đ
+                </span>
               <a
                 className="pc-head-link dropdown-toggle arrow-none me-0"
                 data-bs-toggle="dropdown"

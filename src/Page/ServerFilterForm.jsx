@@ -182,7 +182,7 @@ const ServerFilterForm = () => {
     // Popup xác nhận thanh toán sử dụng qty đúng
     Swal.fire({
       title: "Xác nhận thanh toán",
-      text: `Bạn sẽ tăng ${qty} lượng với giá ${rate} đ. Tổng thanh toán: ${totalCost.toLocaleString("vi-VN")} VNĐ.`,
+      text: `Bạn sẽ tăng ${qty} lượng với giá ${rate} đ. Tổng thanh toán: ${totalCost.toLocaleString("en-US")} VNĐ.`,
       icon: "warning",
       showCancelButton: true,
       confirmButtonText: "Xác nhận",
@@ -312,7 +312,7 @@ const ServerFilterForm = () => {
                             <span className="badge badge-success custom-control-label">{server.maychu}</span>
                             <span className="custom-control-label">{server.name}</span>
                             <span className="badge badge-primary">
-                              {Number(server.rate).toLocaleString("vi-VN")}đ
+                              {Number(server.rate).toLocaleString("en-US")}đ
                             </span>
                             <span className="badge badge-success custom-control-label">
                               {server.trangthai ? "Hoạt động" : "Không hoạt động"}
@@ -397,7 +397,7 @@ const ServerFilterForm = () => {
                             <h3 className="alert-heading">
                               Tổng thanh toán:{" "}
                               <span className="text-danger">
-                                {Number(totalCost).toLocaleString("vi-VN")}
+                                {Number(totalCost).toLocaleString("en-US")}
                               </span>{" "}
                               VNĐ
                             </h3>

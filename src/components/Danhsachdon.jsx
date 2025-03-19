@@ -231,6 +231,8 @@ const Danhsachdon = () => {
                       <th>Bắt đầu</th>
                       <th>Đã chạy</th>
                       <th>Số lượng mua</th>
+                      <th>Giá</th>
+                      <th>Tổng tiền</th>
                       <th>Trạng thái</th>
                       {selectedCategory === "BÌNH LUẬN" && <th>Bình luận</th>}
                       <th>Ghi chú</th>
@@ -243,13 +245,21 @@ const Danhsachdon = () => {
                         <td>{index + 1}</td>
                         <td>{order.Madon}</td>
                         <td >{order.username}</td>
-                        <td >
+                        <td style={{
+                          maxWidth: "250px",
+                          whiteSpace: "normal",         // cho phép xuống dòng
+                          wordWrap: "break-word",       // tự động xuống dòng nếu từ quá dài
+                          overflowWrap: "break-word"    // tương tự wordWrap
+                        }}
+                        > 
                           {order.link}
                         </td>
                         <td >{order.maychu}{order.namesv}</td>
                         <td>{order.start}</td>
                         <td>{order.dachay}</td>
                         <td>{order.quantity}</td>
+                        <td >{Number(order.rate).toLocaleString("en-US")}</td>
+                        <td >{Number(order.totalCost).toLocaleString("en-US")}</td>
                         <td>
                           {order.status === "Completed" ? (
                             <span className="badge badge-success">Hoàn thành</span>
