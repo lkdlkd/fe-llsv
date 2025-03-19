@@ -142,7 +142,6 @@ const UserList = () => {
                         <span className="badge bg-primary">Người dùng</span>
                       ) : <span>{user.role}</span>}
                       </td>
-                      <td>{user.role}</td>
                       <td>{user.status}</td>
                       <td>
                         <button
