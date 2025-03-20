@@ -276,7 +276,7 @@ function Naptien() {
                 </div>
                 <div className="text-center mb-3">
                   <img
-                    src={`https://img.vietqr.io/image/${bank.bank_name}-${bank.account_number}-qronly2.jpg?accountName=${encodeURIComponent(bank.account_name)}&addInfo=${encodeURIComponent(`lsv ${username}`)}`}
+                    src={`https://img.vietqr.io/image/${bank.bank_name}-${bank.account_number}-qronly2.jpg?accountName=${encodeURIComponent(bank.account_name)}&addInfo=${encodeURIComponent(`lsv ${user.username}`)}`}
                     alt="QR CODE"
                     width="300"
                   />
