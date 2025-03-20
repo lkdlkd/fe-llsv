@@ -4,6 +4,7 @@ import { deductBalance } from "../../utils/apiAdmin";
 
 const DeductBalanceForm = ({ user, onClose, onUserUpdated }) => {
   const [amount, setAmount] = useState("");
+  const [loading, setLoading] = useState(false);
   const token = localStorage.getItem("token");
 
   const handleSubmit = async (e) => {
@@ -17,18 +18,21 @@ const DeductBalanceForm = ({ user, onClose, onUserUpdated }) => {
       return;
     }
     try {
+      setLoading(true);
       const data = await deductBalance(user._id, numericAmount, token);
       Swal.fire({
         icon: "success",
         title: data.message || "Trừ tiền thành công",
       });
-      onUserUpdated(); // Cập nhật lại danh sách hoặc thông tin người dùng
+      onUserUpdated(); // Cập nhật lại thông tin người dùng
       onClose(); // Đóng form
     } catch (error) {
       Swal.fire({
         icon: "error",
         title: error.message || "Lỗi khi trừ tiền",
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -44,23 +48,31 @@ const DeductBalanceForm = ({ user, onClose, onUserUpdated }) => {
               <h4>Trừ tiền cho {user.username}</h4>
               <form onSubmit={handleSubmit}>
                 <div className="form-group">
-                  <label>Số tiền cần trừ: {Number(amount).toLocaleString("en-US")}</label>
+                  <label>
+                    Số tiền cần trừ: {Number(amount).toLocaleString("en-US")}
+                  </label>
                   <input
                     type="number"
                     className="form-control"
                     value={amount}
                     onChange={(e) => setAmount(e.target.value)}
                     placeholder="Nhập số tiền"
+                    disabled={loading}
                   />
                 </div>
                 <div className="form-group mt-2">
-                  <button type="submit" className="btn btn-danger">
-                    Trừ tiền
+                  <button
+                    type="submit"
+                    className="btn btn-danger"
+                    disabled={loading}
+                  >
+                    {loading ? "Đang xử lý..." : "Trừ tiền"}
                   </button>
                   <button
                     type="button"
                     className="btn btn-secondary ms-2"
                     onClick={onClose}
+                    disabled={loading}
                   >
                     Hủy
                   </button>

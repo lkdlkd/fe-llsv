@@ -22,6 +22,7 @@ const ChangePasswordForm = ({ userId, onPasswordChanged }) => {
     }
     try {
       const data = await changePassword(userId, oldPassword, newPassword, token);
+      console.log(data.token)
       if (data.token) {
         localStorage.setItem("token", data.token);
       }

@@ -5,6 +5,7 @@ import { addUserBalance } from "../../utils/apiAdmin";
 
 const AddBalanceForm = ({ user, onClose, onUserUpdated }) => {
   const [amount, setAmount] = useState("");
+  const [loading, setLoading] = useState(false);
   const token = localStorage.getItem("token");
 
   const handleSubmit = async (e) => {
@@ -18,6 +19,7 @@ const AddBalanceForm = ({ user, onClose, onUserUpdated }) => {
       return;
     }
     try {
+      setLoading(true);
       await addUserBalance(user._id, parsedAmount, token);
       Swal.fire({
         icon: "success",
@@ -30,6 +32,8 @@ const AddBalanceForm = ({ user, onClose, onUserUpdated }) => {
         icon: "error",
         title: error.message || "Lỗi khi cộng tiền!",
       });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -44,15 +48,21 @@ const AddBalanceForm = ({ user, onClose, onUserUpdated }) => {
             <div className="add-balance-form-container">
               <h3>Cộng tiền cho người dùng: {user.username}</h3>
               <form onSubmit={handleSubmit}>
-                <label>Số tiền cần cộng: {Number(amount).toLocaleString("en-US")}</label>
+                <label>
+                  Số tiền cần cộng:{" "}
+                  {Number(amount).toLocaleString("en-US")}
+                </label>
                 <input
                   type="number"
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
                   placeholder="Nhập số tiền"
+                  disabled={loading}
                 />
-                <button type="submit">Cộng tiền</button>
-                <button type="button" onClick={onClose}>
+                <button type="submit" disabled={loading}>
+                  {loading ? "Đang xử lý..." : "Cộng tiền"}
+                </button>
+                <button type="button" onClick={onClose} disabled={loading}>
                   Hủy
                 </button>
               </form>

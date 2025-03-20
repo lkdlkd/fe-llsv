@@ -104,7 +104,7 @@ function Profile() {
                                                             </div>
 
                                                             <div class="col-md-12 form-group">
-                                                                <label for="api_token" class="form-label">Api Token</label>
+                                                                <label for="api_token" class="form-label">Api Key</label>
                                                                 <div className="input-group">
                                                                     <input
                                                                         type="text"
@@ -133,7 +133,7 @@ function Profile() {
                                                     <h5 class="card-title">Đổi mật khẩu</h5>
                                                 </div>
                                                 <div class="card-body">
-                                                    <ChangePasswordForm userId={user._id} />
+                                                    <ChangePasswordForm userId={user.userId} />
                                                 </div>
                                             </div>
                                         </div>

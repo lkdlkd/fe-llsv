@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import "../../SmmForm.css"; // Import file CSS riêng
-import { 
-  fetchSmmPartners, 
-  fetchServers, 
-  addServerService, 
-  updateServerService, 
-  deleteServerService 
+import {
+  fetchSmmPartners,
+  fetchServers,
+  addServerService,
+  updateServerService,
+  deleteServerService
 } from "../../utils/apiAdmin";
 import axios from 'axios';
 
@@ -214,9 +214,18 @@ const Smmdv = () => {
                   name="type"
                   value={formData.type}
                   onChange={handleChange}
+                  list="serviceTypes"
                   required
                 />
-
+                <datalist id="serviceTypes">
+                  <option value="FACEBOOK" />
+                  <option value="TIKTOK" />
+                  <option value="INSTAGRAM" />
+                  <option value="YOUTUBE" />
+                  <option value="THREAD" />
+                  <option value="TELEGRAM" />
+                  <option value="SHOPPE" />
+                </datalist>
                 <label>Danh mục:</label>
                 <input
                   type="text"
@@ -435,7 +444,7 @@ const Smmdv = () => {
                         <td>{serverItem.isActive ? "Hiển thị" : "Ẩn"}</td>
                         <td>
                           <button onClick={() => handleEdit(serverItem)}>Sửa</button>
-                          <button onClick={() => handleDelete(serverItem.id)}>Xóa</button>
+                          <button onClick={() => handleDelete(serverItem._id)}>Xóa</button>
                         </td>
                       </tr>
                     ))}
