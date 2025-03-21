@@ -89,7 +89,7 @@ const Smmdv = () => {
     e.preventDefault();
     try {
       if (editMode) {
-        await updateServerService(editService.id, formData, token);
+        await updateServerService(editService._id, formData, token);
         alert("Đã sửa dịch vụ thành công!");
       } else {
         await addServerService(formData, token);
