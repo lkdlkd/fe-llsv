@@ -134,6 +134,21 @@ const Quantri = () => {
           </div>
         </div>
       </div>
+      <div class="col-md-3">
+        <div class="card">
+          <div class="card-body p-3">
+            <div class="d-flex align-items-center">
+              <div class="avtar bg-light-primary me-3">
+                <i class="ti ti-coin fs-2"></i>
+              </div>
+              <div>
+                <h4 class="mb-0">{Number(stats.tongdoanhthuhnay).toLocaleString("en-US")}</h4>
+                <p class="mb-0 text-opacity-75 capitalize">Doanh thu hôm nay</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
       <div class="col-md-12">
         <div class="card">
           <div class="card-header">
